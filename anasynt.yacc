@@ -1,13 +1,32 @@
-D   [0-9]
-INT {D}+("e"{D}+)?
-OPE [+\-*/"<<"">>"&|\^]
-TYPE "int"|"const"
-NAME [a-zA-Z][a-zA-Z0-9_]*
+%start program
+
+%token tNB tEQ tOB tCB tSEM tCOMMA tOPE tWHILE tVOID t tOP tCP tID tCOMM
 
 %%
-
 //rules
 
+program:
+        tOP tCP body
+    ;
+
+body:
+        tOB expression tCB
+    ;
+expression:
+        tSEM
+        ;
+
+
+
 %%
 
-//code
+#include <stdio.h>
+
+void yyerror(char *s) {
+    fprintf(stderr, "%s\n", s) ;
+}
+
+int main(){
+    yydebug = 1;
+    return yyparse();
+}

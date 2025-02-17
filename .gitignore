@@ -1,4 +1,6 @@
 *.yy.c
+*.tab.*
 *.out
+*.output
 WIP/
 build/

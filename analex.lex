@@ -1,3 +1,7 @@
+%{
+#include "y.tab.h"
+%}
+
 %option noyywrap
 D   [0-9]
 INT {D}+("e"{D}+)?
@@ -7,7 +11,7 @@ NAME [a-zA-Z][a-zA-Z0-9_]*
 
 
 %%
-{INT}            printf(" tNB[%s]", yytext);
+{INT}           {printf(" tNB[%s]", yytext); return tNB;}
 "="             printf(" tEQ");
 "{"             printf(" tOB");
 "}"             printf(" tCB");
@@ -17,10 +21,10 @@ NAME [a-zA-Z][a-zA-Z0-9_]*
 while           printf(" tWHILE");
 void            printf(" tVOID");
 {TYPE}          printf(" t[%s]",yytext);
-"("             printf(" tOP");
+"("             return tOP;
 ")"             printf(" tCP");
 {NAME}          printf(" tID[%s]", yytext);
-"//"[^\n]*       printf(" tCOMM[%s]",yytext+2);
+"//"[^\n]*      printf(" tCOMM[%s]",yytext+2);
 "/*".*"*/"      printf(" tCOMM[%s]",yytext);
 " "             { }
 \t              { }
