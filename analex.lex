@@ -20,6 +20,8 @@ void            printf(" tVOID");
 "("             printf(" tOP");
 ")"             printf(" tCP");
 {NAME}          printf(" tID[%s]", yytext);
+"//"[^\n]*       printf(" tCOMM[%s]",yytext+2);
+"/*".*"*/"      printf(" tCOMM[%s]",yytext);
 " "             { }
 \t              { }
 \n              { }
@@ -27,7 +29,7 @@ void            printf(" tVOID");
 
 %%
 
-int main(void) {
-	yylex();
-    return 0;
-}
+// int main(void) {
+// 	yylex();
+//     return 0;
+// }
