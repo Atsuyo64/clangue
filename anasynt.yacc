@@ -1,6 +1,6 @@
 %start program
 
-%token tNB tEQ tOB tCB tSEM tCOMMA tOPE tWHILE tVOID t tOP tCP tID tCOMM
+%token tNB tEQ tOB tCB tSEM tCOMMA tOPE tWHILE tVOID t tOP tCP tID tCOMM tMAIN
 
 %%
 //rules
