@@ -1,5 +1,13 @@
 %{
 #include "y.tab.h"
+
+#ifdef DEBUG_LEX
+#define NAME_RET(x)  {printf(" " #x);}
+#define VALUE_RET(x) {printf(" " #x "[%s]",yytext);}
+#else //not DEBUG_LEX
+#define NAME_RET(x)  {printf(" " #x); return x;}
+#define VALUE_RET(x) {printf(" " #x "[%s]",yytext); return x;}
+#endif //DEBUG_LEX
 %}
 
 %option noyywrap
@@ -11,7 +19,7 @@ NAME [a-zA-Z][a-zA-Z0-9_]*
 
 
 %%
-{INT}           {printf(" tNB[%s]", yytext); return tNB;}
+{INT}           VALUE_RET(tNB)
 "="             printf(" tEQ");
 "{"             printf(" tOB");
 "}"             printf(" tCB");
@@ -21,7 +29,7 @@ NAME [a-zA-Z][a-zA-Z0-9_]*
 while           printf(" tWHILE");
 void            printf(" tVOID");
 {TYPE}          printf(" t[%s]",yytext);
-"("             return tOP;
+"("             NAME_RET(tOP);
 ")"             printf(" tCP");
 {NAME}          printf(" tID[%s]", yytext);
 "//"[^\n]*      printf(" tCOMM[%s]",yytext+2);
