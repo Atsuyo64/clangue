@@ -1,20 +1,88 @@
 %start program
 
-%token tNB tEQ tOB tCB tSEM tCOMMA tOPE tWHILE tVOID t tOP tCP tID tCOMM tMAIN
+%token tNB tEQ tOB tCB tSEM tCOMMA tOPE tWHILE tVOID tIF tOP tCP tID tMAIN tELSE tTYPE
 
 %%
-//rules
 
 program:
-        tOP tCP body
+        tMAIN tOP tCP body
     ;
 
 body:
-        tOB expression tCB
+        tOB expressions tCB
     ;
+
+expressions: 
+        /* empty */
+        |
+        tSEM expressions /* moche mais fait partie de la spec C */
+        |
+        statement expressions
+    ;
+
 expression:
-        tSEM
-        ;
+        rvalue
+    |
+        declarations
+    ;
+
+declarations:
+        tTYPE declaration
+    ;
+
+declaration:
+        tID
+    |
+        tID tCOMMA declaration
+    |
+        tID tEQ rvalue
+    ;
+
+whilif:
+        if
+    |
+        while
+    ;
+
+while:
+        tWHILE tOP rvalue tCP statement
+    ;
+
+if:
+        tIF tOP rvalue tCP statement
+    |
+        tIF tOP rvalue tCP statement tELSE statement
+    ;
+
+statement:
+        body
+    |
+        expression tSEM
+    |
+        whilif
+    ;
+
+// TODO: *(ptr + 1)
+// TODO: 13[ptr]
+lvalue:
+        tID
+    |
+        tID tOB rvalue tCB
+    ;
+
+rvalue:
+        tNB
+    |
+        lvalue
+    |
+        rvalue tOPE rvalue
+    |
+        tNB tOPE rvalue
+    |
+        lvalue tEQ rvalue
+    |
+        tOP rvalue tCP
+    ; 
 
 
 
