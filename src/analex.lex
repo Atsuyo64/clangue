@@ -1,10 +1,9 @@
 %{
-#include "y.tab.h"
-
 #ifdef DEBUG_LEX
 #define NAME_RET(x)  {printf(" " #x);}
 #define VALUE_RET(x) {printf(" " #x "[%s]",yytext);}
 #else //not DEBUG_LEX
+#include "y.tab.h"
 #define NAME_RET(x)  {printf(" " #x); return x;}
 #define VALUE_RET(x) {printf(" " #x "[%s]",yytext); return x;}
 #endif //DEBUG_LEX

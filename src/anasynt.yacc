@@ -2,6 +2,12 @@
 
 %token tNB tEQ tOB tCB tSEM tCOMMA tOPE tWHILE tVOID tIF tOP tCP tID tMAIN tELSE tTYPE
 
+%{
+#include "stdio.h"
+FILE* file;
+
+%}
+
 %%
 
 program:
@@ -94,7 +100,11 @@ void yyerror(char *s) {
     fprintf(stderr, "%s\n", s) ;
 }
 
-int main(){
+int main(int argv, char** argc){
+    if(argv==1)
+        file = stdin;
+    else
+        file = fopen(argc[1],"w");
     yydebug = 1;
     return yyparse();
 }

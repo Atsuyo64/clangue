@@ -1,20 +1,18 @@
 all: yacc
 
 lex:
-	flex analex.lex
-	gcc lex.yy.c lex_launcher.c -o lex.out
+	flex -o build/lex.yy.c src/analex.lex
+	gcc build/lex.yy.c src/lex_launcher.c -o build/lex.out
 
 testlex:
-	flex analex.lex
-	gcc -D DEBUG_LEX lex.yy.c lex_launcher.c -o lex.out
-	./lex.out < src/test.c > WIP/test.c.txt
-	cat WIP/test.c.txt
+	flex -o build/lex.yy.c src/analex.lex
+	gcc -D DEBUG_LEX build/lex.yy.c src/lex_launcher.c -o build/lex.out
+	build/lex.out < tests/correct-examples/basic.c
 
 yacc:
-	yacc -d -v -t anasynt.yacc
-	flex analex.lex
-	gcc y.tab.c lex.yy.c -o yacc.out
+	yacc -o build/y.tab.c -d -v -t src/anasynt.yacc
+	flex -o build/lex.yy.c src/analex.lex
+	gcc build/y.tab.c build/lex.yy.c -o build/yacc.out
 
 testyacc: yacc
-	./yacc.out < tests/correct-examples/basic.c > WIP/test.c.txt
-	cat WIP/test.c.txt
+	build/yacc.out < tests/correct-examples/basic.c
