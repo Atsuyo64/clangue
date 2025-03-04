@@ -21,7 +21,7 @@ NAME [a-zA-Z_][a-zA-Z0-9_]*
 
 %%
 "//"[^\n]*                  { }
-"/*".*"*/"                  { }
+"/*"(.|\n|\t)*"*/"                  { }
 "main"                      NAME_RET(tMAIN)
 {INT}                       VALUE_RET(tNB)
 {OPE}                       VALUE_RET(tOPE)
