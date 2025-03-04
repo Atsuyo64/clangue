@@ -16,5 +16,5 @@ yacc:
 	gcc y.tab.c lex.yy.c -o yacc.out
 
 testyacc: yacc
-	./yacc.out < src/test.c > WIP/test.c.txt
+	./yacc.out < tests/correct-examples/basic.c > WIP/test.c.txt
 	cat WIP/test.c.txt
