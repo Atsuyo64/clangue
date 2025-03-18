@@ -1,20 +1,32 @@
 %start program
 
-%union {int nb;char* id;}
+%union {int nb;char* id;int* ptr;}
 
-%token tEQ tOB tCB tSEM tCOMMA tOPE tWHILE tVOID tIF tOP tCP tMAIN tELSE tOSB tCSB
+%token tEQ tOB tCB tSEM tCOMMA tWHILE tVOID tIF tOP tCP tMAIN tELSE tOSB tCSB tADD tSUB tMUL tDIV
+
+%right tEQ
+%left tADD tSUB
+%left tMUL tDIV
+
+
+//TODO: dangling else 
 
 %{
 #include "stdio.h"
 #include "vector.h"
+#include "stdlib.h" //exit
+
+void yyerror(char *s); //
 FILE* file;
 vector vec;
 TYPE currentType = INT;
+
+
 %}
 
 %token <nb> tNB
-%token <id> tID tTYPE
-%type <nb> rvalue
+%token <id> tID tTYPE tOPE
+%type <ptr> rvalue lvalue
 
 %%
 
@@ -42,36 +54,31 @@ expression:
 
 declarations:
         tTYPE tID {
-            cell data = {$2,vec.max_height,NULL,str2type($1)};
-            push(&vec,data);
+            push(&vec,$2);
         }
     |
-        tTYPE {currentType=str2type($1);} tID tCOMMA declaration {
-            cell data = {$2,vec.max_height,NULL,currentType};
-            push(&vec,data);
+        tTYPE tID tCOMMA declaration {
+            push(&vec,$2);
         }
     |
         tTYPE tID tEQ rvalue {
-            //FIXME: use rvalue !
-            cell data = {$2,vec.max_height,NULL,str2type($1)};
-            push(&vec,data);
+            int* ptr = push(&vec,$2);
+            fprintf(file,"LOAD %i %i\n",(int)ptr,$4);
         }
     ;
 
 declaration:
         tID {
-            cell data = {$1,vec.max_height,NULL,currentType};
-            push(&vec,data);
+            push(&vec,$1);
         }
     |
         tID tCOMMA declaration {
-            cell data = {$1,vec.max_height,NULL,currentType};
-            push(&vec,data);
+            push(&vec,$1);
         }
     |
         tID tEQ rvalue {
-            cell data = {$1,vec.max_height,NULL,currentType};
-            push(&vec,data);
+            int* ptr = push(&vec,$1);
+            fprintf(file,"LOAD %i %i\n",(int)ptr,$3);
         }
     ;
 
@@ -81,6 +88,7 @@ whilif:
         while
     ;
 
+//TODO:
 while:
         tWHILE tOP rvalue tCP statement
     ;
@@ -101,24 +109,69 @@ statement:
 
 // TODO: *(ptr + 1)
 // TODO: 13[ptr]
-lvalue:
-        tID
+lvalue: //ok
+        tID {
+            cell* data;
+            if(data = find(&vec,$1)) {
+                $$=data->ptr;
+            }
+            else{
+                fprintf(stderr,"undef symbol %s at line %i",$1,__LINE__);
+                exit(1);
+            }
+        }
     |
-        tID tOSB rvalue tCSB
+        tID tOSB rvalue tCSB {
+            fprintf(strerr,"Not implemented a[i]: (%i)",__LINE__);
+            exit(1);
+        }
     ;
 
 rvalue:
-        tNB
+        tNB {
+            //TODO: elevate
+            int* ptr = push(&vec,getTempName());
+            fprintf(file,"AFC %i %i\n",(int)ptr,$1);
+            $$=ptr;
+        }
     |
         lvalue
     |
-        rvalue tOPE rvalue
+        rvalue tADD rvalue {
+            int* ptr = push(&vec,getTempName());
+            fprintf(file,"ADD %i %i %i\n",ptr,$1,$3);
+            $$=ptr;
+        }
     |
-        tNB tOPE rvalue
+        rvalue tSUB rvalue {
+            int* ptr = push(&vec,getTempName());
+            fprintf(file,"SUB %i %i %i\n",ptr,$1,$3);
+            $$=ptr;
+        }
     |
-        lvalue tEQ rvalue
+        rvalue tMUL rvalue {
+            int* ptr = push(&vec,getTempName());
+            fprintf(file,"MUL %i %i %i\n",ptr,$1,$3);
+            $$=ptr;
+        }
     |
-        tOP rvalue tCP
+        rvalue tDIV rvalue {
+            int* ptr = push(&vec,getTempName());
+            fprintf(file,"DIV %i %i %i\n",ptr,$1,$3);
+            $$=ptr;
+        }
+    |
+        rvalue tOPE rvalue {
+            fprintf(stderr,"Unsupported operation: %s (line %i)\n",$2,__LINE__);
+            exit(1);
+        }
+    |
+        lvalue tEQ rvalue {
+            fprintf(file,"LOAD %i %i\n",$1,$3);
+            $$=$1;
+        }
+    |
+        tOP rvalue tCP {$$=$2;}
     ; 
 
 

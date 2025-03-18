@@ -14,7 +14,7 @@
 %option noyywrap
 D   [0-9]
 INT [\-\+]?{D}+("e"{D}+)?
-OPE [+\-*/&|\^<>]|"=="|"<="|">="|"!="|"<<"|">>"
+OPE [&|\^<>]|"=="|"<="|">="|"!="|"<<"|">>"
 TYPE "int"|"const"
 NAME [a-zA-Z_][a-zA-Z0-9_]*
 
@@ -22,8 +22,12 @@ NAME [a-zA-Z_][a-zA-Z0-9_]*
 "//"[^\n]*                  { }
 "/*"(.|\n|\t)*"*/"                  { }
 "main"                      NAME_RET(tMAIN)
-{INT}                       VALUE_RET(tNB)
+{INT}                       VALUE_RET(tNB) //TODO: atoi / strtod
 {OPE}                       VALUE_RET(tOPE)
+"+"                         VALUE_RET(tADD)
+"-"                         VALUE_RET(tSUB)
+"*"                         VALUE_RET(tDIV)
+"/"                         VALUE_RET(tMUL)
 "="                         NAME_RET(tEQ)
 "{"                         NAME_RET(tOB)
 "}"                         NAME_RET(tCB)
