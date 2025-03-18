@@ -4,9 +4,9 @@
 
 %{
 #include "stdio.h"
+#include "vector.h"
 FILE* file;
-
-
+vector vec;
 
 %}
 
@@ -103,6 +103,7 @@ void yyerror(char *s) {
 }
 
 int main(int argv, char** argc){
+    vec = newVector();
     if(argv==1)
         file = stdin;
     else
