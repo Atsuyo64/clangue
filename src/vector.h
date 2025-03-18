@@ -3,7 +3,7 @@
 typedef enum TYPE {
     CONST,
     INT,
-    FUNC,
+    //FUNC,
 } TYPE;
 
 typedef struct
@@ -23,7 +23,7 @@ typedef struct
 } vector;
 
 vector newVector();
-void push(vector *vec, cell data);
+void push(vector *vec, char* ID);
 void elevate(vector *vec);
 void delevate(vector *vec);
 cell *find(vector *v, char *id);

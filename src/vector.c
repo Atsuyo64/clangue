@@ -38,18 +38,24 @@ void doubleVecSize(vector* vec) {
     vec->cells = ptr;
 }
 
+static int* sp = 0;
+
 #define INIT_VEC_CAPA 128
 
 vector newVector(){
     vector v = {malloc(INIT_VEC_CAPA*sizeof(cell)),INIT_VEC_CAPA,0,0};
     return v;
 }
-void push(vector* vec,cell data){
+void push(vector* vec,char* ID){
 #ifdef DEBUG_VEC
-    printf("vec(%i/%i) id %s (%i) pushed\n",vec->size+1,vec->capacity,data.id,vec->max_height);
+    printf("vec(%i/%i) id %s (%i) pushed\n",vec->size+1,vec->capacity,ID,vec->max_height);
 #endif // DEBUG_VEC
     if (vec->size == vec->capacity)
         doubleVecSize(vec);
+
+    char* ptr = malloc(256);
+    strncpy(ptr,ID,255);
+    cell data = {ptr,vec->max_height,sp++,INT};
     vec->cells[vec->size++] = data;
 }
 
@@ -63,6 +69,9 @@ void delevate(vector* vec)
     vec->max_height = new_height;
     for(int i = 0;i<vec->capacity;++i) {
         if (vec->cells[i].height > new_height) {
+            for(int j=i;j<vec->size;++j)
+                free(vec->cells[j].id);
+            sp -= vec->size - i;
             vec->size = i;
             return;
         }
