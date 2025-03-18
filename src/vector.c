@@ -46,7 +46,7 @@ vector newVector(){
     vector v = {malloc(INIT_VEC_CAPA*sizeof(cell)),INIT_VEC_CAPA,0,0};
     return v;
 }
-void push(vector* vec,char* ID){
+int* push(vector* vec,char* ID){
 #ifdef DEBUG_VEC
     printf("vec(%i/%i) id %s (%i) pushed\n",vec->size+1,vec->capacity,ID,vec->max_height);
 #endif // DEBUG_VEC
@@ -57,6 +57,7 @@ void push(vector* vec,char* ID){
     strncpy(ptr,ID,255);
     cell data = {ptr,vec->max_height,sp++,INT};
     vec->cells[vec->size++] = data;
+    return data.ptr;
 }
 
 void elevate(vector* vec) 
