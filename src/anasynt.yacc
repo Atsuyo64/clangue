@@ -1,23 +1,29 @@
 %start program
 
-%token tNB tEQ tOB tCB tSEM tCOMMA tOPE tWHILE tVOID tIF tOP tCP tID tMAIN tELSE tTYPE
+%union {int nb;char* id;}
+
+%token tEQ tOB tCB tSEM tCOMMA tOPE tWHILE tVOID tIF tOP tCP tMAIN tELSE tOSB tCSB
 
 %{
 #include "stdio.h"
 #include "vector.h"
 FILE* file;
 vector vec;
-
+TYPE currentType = INT;
 %}
+
+%token <nb> tNB
+%token <id> tID tTYPE
+%type <nb> rvalue
 
 %%
 
 program:
-        tMAIN tOP tCP body
+        tMAIN tOP tCP body 
     ;
 
 body:
-        tOB expressions tCB
+        tOB {elevate(&vec);} expressions tCB {delevate(&vec);} 
     ;
 
 expressions: 
@@ -35,15 +41,38 @@ expression:
     ;
 
 declarations:
-        tTYPE declaration
+        tTYPE tID {
+            cell data = {$2,vec.max_height,NULL,str2type($1)};
+            push(&vec,data);
+        }
+    |
+        tTYPE {currentType=str2type($1);} tID tCOMMA declaration {
+            cell data = {$2,vec.max_height,NULL,currentType};
+            push(&vec,data);
+        }
+    |
+        tTYPE tID tEQ rvalue {
+            //FIXME: use rvalue !
+            cell data = {$2,vec.max_height,NULL,str2type($1)};
+            push(&vec,data);
+        }
     ;
 
 declaration:
-        tID
+        tID {
+            cell data = {$1,vec.max_height,NULL,currentType};
+            push(&vec,data);
+        }
     |
-        tID tCOMMA declaration
+        tID tCOMMA declaration {
+            cell data = {$1,vec.max_height,NULL,currentType};
+            push(&vec,data);
+        }
     |
-        tID tEQ rvalue
+        tID tEQ rvalue {
+            cell data = {$1,vec.max_height,NULL,currentType};
+            push(&vec,data);
+        }
     ;
 
 whilif:
@@ -75,7 +104,7 @@ statement:
 lvalue:
         tID
     |
-        tID tOB rvalue tCB
+        tID tOSB rvalue tCSB
     ;
 
 rvalue:

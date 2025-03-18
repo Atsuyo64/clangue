@@ -27,6 +27,8 @@ NAME [a-zA-Z_][a-zA-Z0-9_]*
 "="                         NAME_RET(tEQ)
 "{"                         NAME_RET(tOB)
 "}"                         NAME_RET(tCB)
+"["                         NAME_RET(tOSB)
+"]"                         NAME_RET(tCSB)
 ";"                         NAME_RET(tSEM)
 ","                         NAME_RET(tCOMMA)
 "if"                        NAME_RET(tIF)

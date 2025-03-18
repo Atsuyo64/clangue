@@ -27,3 +27,4 @@ void push(vector *vec, cell data);
 void elevate(vector *vec);
 void delevate(vector *vec);
 cell *find(vector *v, char *id);
+TYPE str2type(char* str);

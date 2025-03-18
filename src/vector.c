@@ -90,3 +90,15 @@ cell* find(vector* v,char* id) {
     }
     return NULL;
 }
+
+
+TYPE str2type(char* str) {
+    if (strncmp(str ,"int", 3) == 0) {
+        return INT;
+    } else if (strncmp(str ,"const", 4) == 0) {
+        return CONST;
+    } else {
+        fprintf(stderr, "Unknown type : %s\nExiting...", str);
+        exit(1);
+    }
+}
