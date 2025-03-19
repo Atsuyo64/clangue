@@ -1,3 +1,3 @@
 #pragma once
 
-char* getTempName()
+char* getTempName();

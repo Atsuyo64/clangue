@@ -15,12 +15,14 @@
 #include "stdio.h"
 #include "vector.h"
 #include "stdlib.h" //exit
+#include "utils.h"
 
 void yyerror(char *s); //
 FILE* file;
 vector vec;
 TYPE currentType = INT;
-
+int if_height = 0;
+int while_height = 0;
 
 %}
 
@@ -63,7 +65,7 @@ declarations:
     |
         tTYPE tID tEQ rvalue {
             int* ptr = push(&vec,$2);
-            fprintf(file,"LOAD %i %i\n",(int)ptr,$4);
+            fprintf(file,"LOAD %p %p\n",ptr,$4);
         }
     ;
 
@@ -78,17 +80,16 @@ declaration:
     |
         tID tEQ rvalue {
             int* ptr = push(&vec,$1);
-            fprintf(file,"LOAD %i %i\n",(int)ptr,$3);
+            fprintf(file,"LOAD %p %p\n",ptr,$3);
         }
     ;
 
 whilif:
-        if
+        {fprintf(stderr,"todo if\n");exit(1);} if 
     |
-        while
+        {fprintf(stderr,"todo while\n");exit(1);} while
     ;
 
-//TODO:
 while:
         tWHILE tOP rvalue tCP statement
     ;
@@ -116,13 +117,14 @@ lvalue: //ok
                 $$=data->ptr;
             }
             else{
-                fprintf(stderr,"undef symbol %s at line %i",$1,__LINE__);
+                fprintf(stderr,"Undef symbol %s at line '%i'",$1,__LINE__);
+                fprintf(file,"Undef symbol %s at line '%i'",$1,__LINE__);
                 exit(1);
             }
         }
     |
         tID tOSB rvalue tCSB {
-            fprintf(strerr,"Not implemented a[i]: (%i)",__LINE__);
+            fprintf(stderr,"Not implemented a[i]: (%i)",__LINE__);
             exit(1);
         }
     ;
@@ -131,7 +133,7 @@ rvalue:
         tNB {
             //TODO: elevate
             int* ptr = push(&vec,getTempName());
-            fprintf(file,"AFC %i %i\n",(int)ptr,$1);
+            fprintf(file,"AFC %p #%i\n",ptr,$1);
             $$=ptr;
         }
     |
@@ -139,25 +141,25 @@ rvalue:
     |
         rvalue tADD rvalue {
             int* ptr = push(&vec,getTempName());
-            fprintf(file,"ADD %i %i %i\n",ptr,$1,$3);
+            fprintf(file,"ADD %p %p %p\n",ptr,$1,$3);
             $$=ptr;
         }
     |
         rvalue tSUB rvalue {
             int* ptr = push(&vec,getTempName());
-            fprintf(file,"SUB %i %i %i\n",ptr,$1,$3);
+            fprintf(file,"SUB %p %p %p\n",ptr,$1,$3);
             $$=ptr;
         }
     |
         rvalue tMUL rvalue {
             int* ptr = push(&vec,getTempName());
-            fprintf(file,"MUL %i %i %i\n",ptr,$1,$3);
+            fprintf(file,"MUL %p %p %p\n",ptr,$1,$3);
             $$=ptr;
         }
     |
         rvalue tDIV rvalue {
             int* ptr = push(&vec,getTempName());
-            fprintf(file,"DIV %i %i %i\n",ptr,$1,$3);
+            fprintf(file,"DIV %p %p %p\n",ptr,$1,$3);
             $$=ptr;
         }
     |
@@ -167,7 +169,7 @@ rvalue:
         }
     |
         lvalue tEQ rvalue {
-            fprintf(file,"LOAD %i %i\n",$1,$3);
+            fprintf(file,"LOAD %p %p\n",$1,$3);
             $$=$1;
         }
     |
@@ -178,18 +180,21 @@ rvalue:
 
 %%
 
-#include <stdio.h>
-
 void yyerror(char *s) {
     fprintf(stderr, "%s\n", s) ;
 }
 
 int main(int argv, char** argc){
     vec = newVector();
-    if(argv==1)
-        file = stdin;
+    if(argv==1){
+        printf("WRITING TO STDOUT\n");
+        file = stdout;
+    }
     else
         file = fopen(argc[1],"w");
     yydebug = 1;
-    return yyparse();
+    int ret =  yyparse();
+    if (file != stdout)
+        fclose(file);
+    return ret; 
 }

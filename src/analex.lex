@@ -1,14 +1,18 @@
 %{
+#include "string.h"
+#include "stdlib.h"
 #ifdef DEBUG_LEX
 #define NAME_RET(x)  {printf(" " #x);}
-#define VALUE_RET(x) {printf(" " #x "[%s]",yytext);}
+#define VALUE_RET_ID(x) {printf(" " #x "[%s]",yytext);}
+#define VALUE_RET_NB(x) {printf(" " #x "[%s]",yytext);}
 #else //not DEBUG_LEX
 #include "y.tab.h"
+//TODO: manually parse exponent notation !
 #define NAME_RET(x)  {printf(" " #x); return x;}
-#define VALUE_RET(x) {printf(" " #x "[%s]",yytext); return x;}
+#define VALUE_RET_ID(x) {printf(" " #x "[%s]",yytext); yylval.id=strdup(yytext); return x;}
+#define VALUE_RET_NB(x) {printf(" " #x "[%s]",yytext); yylval.nb=(int)strtold(yytext,NULL); return x;}
 #endif //DEBUG_LEX
 
-//TODO: "==""<="">=""!="
 %}
 
 %option noyywrap
@@ -20,14 +24,14 @@ NAME [a-zA-Z_][a-zA-Z0-9_]*
 
 %%
 "//"[^\n]*                  { }
-"/*"(.|\n|\t)*"*/"                  { }
+"/*"(.|\n|\t)*"*/"          { }
 "main"                      NAME_RET(tMAIN)
-{INT}                       VALUE_RET(tNB) //TODO: atoi / strtod
-{OPE}                       VALUE_RET(tOPE)
-"+"                         VALUE_RET(tADD)
-"-"                         VALUE_RET(tSUB)
-"*"                         VALUE_RET(tDIV)
-"/"                         VALUE_RET(tMUL)
+{INT}                       VALUE_RET_NB(tNB)
+{OPE}                       VALUE_RET_ID(tOPE)
+"+"                         NAME_RET(tADD)
+"-"                         NAME_RET(tSUB)
+"*"                         NAME_RET(tDIV)
+"/"                         NAME_RET(tMUL)
 "="                         NAME_RET(tEQ)
 "{"                         NAME_RET(tOB)
 "}"                         NAME_RET(tCB)
@@ -39,10 +43,10 @@ NAME [a-zA-Z_][a-zA-Z0-9_]*
 "else"                      NAME_RET(tELSE)
 "while"                     NAME_RET(tWHILE)
 "void"                      NAME_RET(tVOID)
-{TYPE}                      VALUE_RET(tTYPE)
+{TYPE}                      VALUE_RET_ID(tTYPE)
 "("                         NAME_RET(tOP)
 ")"                         NAME_RET(tCP)
-{NAME}                      VALUE_RET(tID)
+{NAME}                      VALUE_RET_ID(tID)
 " "                         { }
 \t                          { }
 \n                          { }

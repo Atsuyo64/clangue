@@ -1,6 +1,7 @@
-#include "src/vector.h"
+#include "vector.h"
 #include <stdlib.h>
 #include <string.h>
+#include "assert.h"
 
 #define DEBUG_VEC
 
@@ -50,6 +51,7 @@ int* push(vector* vec,char* ID){
 #ifdef DEBUG_VEC
     printf("vec(%i/%i) id %s (%i) pushed\n",vec->size+1,vec->capacity,ID,vec->max_height);
 #endif // DEBUG_VEC
+    assert(ID != NULL && strlen(ID) > 0 && "ID VIDE !");
     if (vec->size == vec->capacity)
         doubleVecSize(vec);
 
