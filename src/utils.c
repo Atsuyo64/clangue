@@ -52,11 +52,11 @@ char* endWhile() {
 char* getCurrentWhileStartFlag()
 {
     if (whileDepth == 0) {
-        fprintf(stderr, "ERROR: CAN'T GET WSF:, NOT IN A WHILE LOOP\n");
+        fprintf(stderr, "ERROR: CAN'T GET WHILE_:, NOT IN A WHILE LOOP\n");
         exit(1);
     }
-    strcpy(whileName, "__WSF"); // while start: flag
-    char whileNameNumber[MAX_VAR_NAM_SIZE - 5];
+    strcpy(whileName, "__WHILE_"); // while start: flag
+    char whileNameNumber[MAX_VAR_NAM_SIZE - 8];
     sprintf(whileNameNumber, "%d", whileStack[whileDepth - 1]);
     strcat(whileName, whileNameNumber);
     tmpCnt++;
@@ -66,11 +66,11 @@ char* getCurrentWhileStartFlag()
 char* getCurrentWhileEndFlag()
 {
     if (whileDepth == 0) {
-        fprintf(stderr, "ERROR: CAN'T GET WEF:, NOT IN A WHILE LOOP\n");
+        fprintf(stderr, "ERROR: CAN'T GET END_WHILE_:, NOT IN A WHILE LOOP\n");
         exit(1);
     }
-    strcpy(whileName, "__WEF"); // while end: flag
-    char whileNameNumber[MAX_VAR_NAM_SIZE - 5];
+    strcpy(whileName, "__END_WHILE_"); // while end: flag
+    char whileNameNumber[MAX_VAR_NAM_SIZE - 12];
     sprintf(whileNameNumber, "%d", whileStack[whileDepth - 1]);
     strcat(whileName, whileNameNumber);
     tmpCnt++;
@@ -105,11 +105,11 @@ char* endIf() {
 char* getCurrentIfElseFlag()
 {
     if (ifDepth == 0) {
-        fprintf(stderr, "ERROR: CAN'T GET ILF:, NOT IN A IF CONDITION\n");
+        fprintf(stderr, "ERROR: CAN'T GET ELSE_:, NOT IN A IF CONDITION\n");
         exit(1);
     }
-    strcpy(ifName, "__ILF"); // if eLse: flag
-    char ifNameNumber[MAX_VAR_NAM_SIZE - 5];
+    strcpy(ifName, "__ELSE_"); // if eLse: flag
+    char ifNameNumber[MAX_VAR_NAM_SIZE - 7];
     sprintf(ifNameNumber, "%d", ifStack[ifDepth - 1]);
     strcat(ifName, ifNameNumber);
     tmpCnt++;
@@ -119,11 +119,11 @@ char* getCurrentIfElseFlag()
 char* getCurrentIfEndFlag()
 {
     if (ifDepth == 0) {
-        fprintf(stderr, "ERROR: CAN'T GET INF:, NOT IN A IF CONDITION\n");
+        fprintf(stderr, "ERROR: CAN'T GET END_IF_:, NOT IN A IF CONDITION\n");
         exit(1);
     }
-    strcpy(ifName, "__INF"); // if eNd: flag
-    char ifNameNumber[MAX_VAR_NAM_SIZE - 5];
+    strcpy(ifName, "__END_IF_"); // if eNd: flag
+    char ifNameNumber[MAX_VAR_NAM_SIZE - 9];
     sprintf(ifNameNumber, "%d", ifStack[ifDepth - 1]);
     strcat(ifName, ifNameNumber);
     tmpCnt++;
