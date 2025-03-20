@@ -176,6 +176,17 @@ rvalue:
             $$=ptr;
         }
     |
+        tADD rvalue { //+10 conflits de canard ???
+            $$=$2;
+        } %prec'*'
+    |
+        tSUB rvalue { //+10 conflits de canard ???
+            int* ptr = push(&vec,getTempVarName());
+            fprintf(file,"AFC %p #0\n",ptr);
+            fprintf(file,"SUB %p %p %p\n",ptr,ptr,$2);
+            $$=ptr;
+        } %prec'*'
+    |
         lvalue
     |
         rvalue tADD rvalue {

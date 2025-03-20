@@ -10,7 +10,7 @@ main()
         int tmp = 5;
         k = k - 1;
         if(tmp - 3)
-            y = y + 1;
+            y = y+1;
     }
     while(i)
         i=i + 1;
