@@ -85,19 +85,64 @@ declaration:
     ;
 
 whilif:
-        {fprintf(stderr,"todo if\n");exit(1);} if 
+        if 
     |
-        {fprintf(stderr,"todo while\n");exit(1);} while
+        while
     ;
 
 while:
-        tWHILE tOP rvalue tCP statement
+        {   
+            elevate(&vec);
+            fprintf(file,"%s:\n",openWhile());
+        }
+        tWHILE tOP rvalue tCP
+        {
+            fprintf(file,"NOZ $3\n");
+            fprintf(file,"JMF %s\n",getCurrentWhileEndFlag());
+        }
+        statement
+        {
+            fprintf(file,"JMP %s\n",getCurrentWhileStartFlag());
+            fprintf(file,"%s:\n",endWhile());
+            delevate(&vec);
+        }
     ;
 
 if:
-        tIF tOP rvalue tCP statement
+        {
+            elevate(&vec);
+            openIf();
+        }
+        tIF tOP rvalue tCP 
+        {
+            fprintf(file,"NOZ $3\n");
+            fprintf(file,"JMF %s\n",getCurrentIfEndFlag());
+        }
+        statement
+        {
+            fprintf(file,"%s:\n",endIf());
+            delevate(&vec);
+        }
     |
-        tIF tOP rvalue tCP statement tELSE statement
+        //TODO: conflit ici
+        {
+            elevate(&vec);
+            openIf();
+        }
+        tIF tOP rvalue tCP 
+        {
+            fprintf(file,"NOZ $3\n");
+            fprintf(file,"JMF %s\n",getCurrentIfElseFlag());
+        }
+        statement 
+        {
+            fprintf(file,"JMP %s\n",getCurrentIfEndFlag());
+            fprintf(file,"%s:\n",getCurrentIfElseFlag());
+        }
+        tELSE statement
+        {
+            fprintf(file,"%s:\n",endIf());
+        }
     ;
 
 statement:
@@ -132,7 +177,7 @@ lvalue: //ok
 rvalue:
         tNB {
             //TODO: elevate
-            int* ptr = push(&vec,getTempName());
+            int* ptr = push(&vec,getTempVarName());
             fprintf(file,"AFC %p #%i\n",ptr,$1);
             $$=ptr;
         }
@@ -140,25 +185,25 @@ rvalue:
         lvalue
     |
         rvalue tADD rvalue {
-            int* ptr = push(&vec,getTempName());
+            int* ptr = push(&vec,getTempVarName());
             fprintf(file,"ADD %p %p %p\n",ptr,$1,$3);
             $$=ptr;
         }
     |
         rvalue tSUB rvalue {
-            int* ptr = push(&vec,getTempName());
+            int* ptr = push(&vec,getTempVarName());
             fprintf(file,"SUB %p %p %p\n",ptr,$1,$3);
             $$=ptr;
         }
     |
         rvalue tMUL rvalue {
-            int* ptr = push(&vec,getTempName());
+            int* ptr = push(&vec,getTempVarName());
             fprintf(file,"MUL %p %p %p\n",ptr,$1,$3);
             $$=ptr;
         }
     |
         rvalue tDIV rvalue {
-            int* ptr = push(&vec,getTempName());
+            int* ptr = push(&vec,getTempVarName());
             fprintf(file,"DIV %p %p %p\n",ptr,$1,$3);
             $$=ptr;
         }
