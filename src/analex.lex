@@ -8,6 +8,7 @@
 #else //not DEBUG_LEX
 #include "y.tab.h"
 //TODO: manually parse exponent notation !
+//FIXME: i+1 does not work (+1 is a number)
 #define NAME_RET(x)  {printf(" " #x); return x;}
 #define VALUE_RET_ID(x) {printf(" " #x "[%s]",yytext); yylval.id=strdup(yytext); return x;}
 #define VALUE_RET_NB(x) {printf(" " #x "[%s]",yytext); yylval.nb=(int)strtold(yytext,NULL); return x;}
