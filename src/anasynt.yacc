@@ -8,8 +8,8 @@
 %left tADD tSUB
 %left tMUL tDIV
 
-
-//TODO: dangling else 
+//TODO: test dangling elses
+//FIXME: elevate around rvalues !
 
 %{
 #include "stdio.h"
