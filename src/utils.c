@@ -45,7 +45,7 @@ char* endWhile() {
         exit(1);
     }   
     char* endFlagName = getCurrentWhileStartFlag();
-    whileCnt--;
+    whileDepth--;
     return endFlagName;
 }
 
@@ -98,7 +98,7 @@ char* endIf() {
         exit(1);
     }   
     char* endFlagName = getCurrentIfEndFlag();
-    ifCnt--;
+    ifDepth--;
     return endFlagName;
 }
 
