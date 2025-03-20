@@ -97,7 +97,7 @@ char* endIf() {
         fprintf(stderr, "ERROR: IMPOSSIBLE TO CLOSE NON EXISTENT IF\n");
         exit(1);
     }   
-    char* endFlagName = getCurrentifStartFlag();
+    char* endFlagName = getCurrentIfEndFlag();
     ifCnt--;
     return endFlagName;
 }

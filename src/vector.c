@@ -39,7 +39,7 @@ void doubleVecSize(vector* vec) {
     vec->cells = ptr;
 }
 
-static int* sp = 0;
+static int* sp = (int*)4;
 
 #define INIT_VEC_CAPA 128
 
