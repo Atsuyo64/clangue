@@ -3,6 +3,11 @@
 char* getTempVarName();
 
 char* openWhile();
-char* closeWhile();
+char* endWhile();
 char* getCurrentWhileStartFlag();
 char* getCurrentWhileEndFlag();
+
+void openIf();
+char* endIf();
+char* getCurrentIfElseFlag();
+char* getCurrentIfEndFlag();
