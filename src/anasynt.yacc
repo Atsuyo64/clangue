@@ -116,34 +116,28 @@ if:
         tIF tOP rvalue tCP 
         {
             fprintf(file,"NOZ $3\n");
-            fprintf(file,"JMF %s\n",getCurrentIfEndFlag());
-        }
-        statement
-        {
-            fprintf(file,"%s:\n",endIf());
-            delevate(&vec);
-        }
-    |
-        //TODO: conflit ici
-        {
-            elevate(&vec);
-            openIf();
-        }
-        tIF tOP rvalue tCP 
-        {
-            fprintf(file,"NOZ $3\n");
             fprintf(file,"JMF %s\n",getCurrentIfElseFlag());
         }
         statement 
         {
+            delevate(&vec);
             fprintf(file,"JMP %s\n",getCurrentIfEndFlag());
             fprintf(file,"%s:\n",getCurrentIfElseFlag());
+            elevate(&vec);
         }
-        tELSE statement
+        if_part_2
         {
             fprintf(file,"%s:\n",endIf());
+            delevate(&vec);
         }
     ;
+
+if_part_2:
+        /*empty*/
+    |
+        tELSE statement
+;
+
 
 statement:
         body

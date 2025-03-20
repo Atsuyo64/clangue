@@ -32,8 +32,11 @@ endWhile1:
 
 /* IF
 TEST
-JMF end
+JMF else
 [then]
+JMP end
+else:
+???
 end:
 */
 
