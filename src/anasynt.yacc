@@ -17,6 +17,9 @@
 #include "stdlib.h" //exit
 #include "utils.h"
 
+#define YYDEBUG 1
+
+extern int yylex (void);
 void yyerror(char *s); //
 FILE* file;
 vector vec;
@@ -49,7 +52,7 @@ expressions:
     ;
 
 expression:
-        {elevate(&vec);} rvalue {deletave(&vec);}
+        {elevate(&vec);} rvalue {delevate(&vec);}
     |
         declarations
     ;
@@ -65,12 +68,12 @@ declarations:
     |
         tTYPE tID 
         {
-            int* ptr = push(&vec,$2);
+            push_ptr(push(&vec,$2));
             elevate(&vec);
         } 
         tEQ rvalue
         {
-            fprintf(file,"LOAD %p %p\n",ptr,$4); //FIXME: AFC -> LOAD
+            fprintf(file,"LOAD %p %p\n",pop_ptr(),$5); //FIXME: AFC -> LOAD
             delevate(&vec);
         }
     ;
@@ -86,12 +89,12 @@ declaration:
     |
         tID 
         {
-            int* ptr = push(&vec,$1);
+            push_ptr(push(&vec,$1));
             elevate(&vec);
         } 
         tEQ rvalue
         {
-            fprintf(file,"LOAD %p %p\n",ptr,$3); //FIXME: AFC -> LOAD
+            fprintf(file,"LOAD %p %p\n",pop_ptr(),$4); //FIXME: AFC -> LOAD
             delevate(&vec);
         }
     ;
@@ -103,13 +106,14 @@ whilif:
     ;
 
 while:
+        tWHILE 
         {   
             elevate(&vec);
             fprintf(file,"%s:\n",openWhile());
         }
-        tWHILE tOP {elevate(&vec);} rvalue {delevate(&vec);} tCP
+        tOP {elevate(&vec);} rvalue {delevate(&vec);} tCP
         {
-            fprintf(file,"NOZ $3\n");
+            fprintf(file,"NOZ $5\n");
             fprintf(file,"JMF %s\n",getCurrentWhileEndFlag());
         }
         statement
@@ -121,13 +125,14 @@ while:
     ;
 
 if:
+        tIF 
         {
             elevate(&vec);
             openIf();
         }
-        tIF tOP {elevate(&vec);} rvalue {delevate(&vec);} tCP 
+        tOP {elevate(&vec);} rvalue {delevate(&vec);} tCP 
         {
-            fprintf(file,"NOZ $3\n");
+            fprintf(file,"NOZ $5\n");
             fprintf(file,"JMF %s\n",getCurrentIfElseFlag());
         }
         statement 
@@ -173,11 +178,11 @@ lvalue: //ok
                 exit(1);
             }
         }
-    |
-        tID tOSB rvalue tCSB {
-            fprintf(stderr,"Not implemented a[i]: (%i)",__LINE__);
-            exit(1);
-        }
+    //|
+    //    tID tOSB rvalue tCSB {
+    //        fprintf(stderr,"Not implemented a[i]: (%i)",__LINE__);
+    //        exit(1);
+    //    }
     ;
 
 rvalue:
@@ -200,43 +205,50 @@ rvalue:
     |
         lvalue
     |
+        rvalue tADD
         {
-            int* ptr = push(&vec,getTempVarName());
+            push_ptr(push(&vec,getTempVarName()));
             elevate(&vec);
         }
-        rvalue tADD rvalue {
-            fprintf(file,"ADD %p %p %p\n",ptr,$1,$3);
+        rvalue {
+            int* ptr = pop_ptr();
+            fprintf(file,"ADD %p %p %p\n",ptr,$1,$4);
             $$=ptr;
             delevate(&vec);
         }
     |
-    
+        rvalue tSUB
         {
-            int* ptr = push(&vec,getTempVarName());
+            push_ptr(push(&vec,getTempVarName()));
             elevate(&vec);
         }
-        rvalue tSUB rvalue {
-            fprintf(file,"SUB %p %p %p\n",ptr,$1,$3);
+        rvalue {
+            int* ptr = pop_ptr();
+            fprintf(file,"SUB %p %p %p\n",ptr,$1,$4);
             $$=ptr;
             delevate(&vec);
         }
     |
+        rvalue tMUL
         {
-            int* ptr = push(&vec,getTempVarName());
+            push_ptr(push(&vec,getTempVarName()));
             elevate(&vec);
         }
-        rvalue tMUL rvalue {
-            fprintf(file,"MUL %p %p %p\n",ptr,$1,$3);
+        rvalue {
+            int* ptr = pop_ptr();
+            fprintf(file,"MUL %p %p %p\n",ptr,$1,$4);
             $$=ptr;
             delevate(&vec);
         }
     |
+        rvalue tDIV
         {
-            int* ptr = push(&vec,getTempVarName());
+            push_ptr(push(&vec,getTempVarName()));
             elevate(&vec);
         }
-        rvalue tDIV rvalue {
-            fprintf(file,"DIV %p %p %p\n",ptr,$1,$3);
+        rvalue {
+            int* ptr = pop_ptr();
+            fprintf(file,"DIV %p %p %p\n",ptr,$1,$4);
             $$=ptr;
             delevate(&vec);
         }
@@ -246,8 +258,9 @@ rvalue:
             exit(1);
         }
     |
-        lvalue tEQ rvalue {
-            fprintf(file,"LOAD %p %p\n",$1,$3);
+        lvalue tEQ {elevate(&vec);} rvalue {
+            delevate(&vec);
+            fprintf(file,"LOAD %p %p\n",$1,$4);
             $$=$1;
         }
     |

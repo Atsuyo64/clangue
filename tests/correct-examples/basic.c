@@ -8,5 +8,6 @@ k=8 ;
 j = j-1;
 // printf (i) ;
 r=(i+j)*(i+k/j) ;
+j=j+2;
 // printf ( r ) ;
 }

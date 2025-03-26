@@ -114,3 +114,20 @@ TYPE str2type(char* str) {
         exit(1);
     }
 }
+
+static int* ptr_stack[256];
+static int index_ptr_stack = 0;    
+void push_ptr(int* ptr){
+    if (index_ptr_stack>=256) {
+        fprintf(stderr,"ptr stack out of memory !\n");
+        exit(1);
+    }
+    ptr_stack[index_ptr_stack++]=ptr;
+}
+int* pop_ptr(){
+    if (index_ptr_stack<=0) {
+        fprintf(stderr,"trying to pop an empty ptr stack\n");
+        exit(1);
+    }
+    return ptr_stack[--index_ptr_stack];
+}
