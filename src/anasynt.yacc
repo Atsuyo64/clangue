@@ -8,6 +8,9 @@
 %token <id> tID tTYPE tOPE
 %type <ptr> rvalue lvalue
 
+%nonassoc REDUCE 
+%nonassoc tELSE
+
 %right tEQ
 %left tADD tSUB
 %left tMUL tDIV tOPE
@@ -122,7 +125,7 @@ while:
             fprintf(file,"JMP %s\n",getCurrentWhileStartFlag());
             fprintf(file,"%s:\n",endWhile());
             delevate(&vec);
-        }
+        }tELSE
     ;
 
 if:
@@ -151,7 +154,7 @@ if:
     ;
 
 if_part_2:
-        /*empty*/
+        /*empty*/ %prec REDUCE
     |
         tELSE statement
 ;
