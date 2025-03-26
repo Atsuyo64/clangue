@@ -49,7 +49,7 @@ expressions:
     ;
 
 expression:
-        rvalue
+        {elevate(&vec);} rvalue {deletave(&vec);}
     |
         declarations
     ;
@@ -63,9 +63,15 @@ declarations:
             push(&vec,$2);
         }
     |
-        tTYPE tID tEQ rvalue {
+        tTYPE tID 
+        {
             int* ptr = push(&vec,$2);
-            fprintf(file,"LOAD %p %p\n",ptr,$4);
+            elevate(&vec);
+        } 
+        tEQ rvalue
+        {
+            fprintf(file,"LOAD %p %p\n",ptr,$4); //FIXME: AFC -> LOAD
+            delevate(&vec);
         }
     ;
 
@@ -78,9 +84,15 @@ declaration:
             push(&vec,$1);
         }
     |
-        tID tEQ rvalue {
+        tID 
+        {
             int* ptr = push(&vec,$1);
-            fprintf(file,"LOAD %p %p\n",ptr,$3);
+            elevate(&vec);
+        } 
+        tEQ rvalue
+        {
+            fprintf(file,"LOAD %p %p\n",ptr,$3); //FIXME: AFC -> LOAD
+            delevate(&vec);
         }
     ;
 
@@ -95,7 +107,7 @@ while:
             elevate(&vec);
             fprintf(file,"%s:\n",openWhile());
         }
-        tWHILE tOP rvalue tCP
+        tWHILE tOP {elevate(&vec);} rvalue {delevate(&vec);} tCP
         {
             fprintf(file,"NOZ $3\n");
             fprintf(file,"JMF %s\n",getCurrentWhileEndFlag());
@@ -113,7 +125,7 @@ if:
             elevate(&vec);
             openIf();
         }
-        tIF tOP rvalue tCP 
+        tIF tOP {elevate(&vec);} rvalue {delevate(&vec);} tCP 
         {
             fprintf(file,"NOZ $3\n");
             fprintf(file,"JMF %s\n",getCurrentIfElseFlag());
@@ -170,7 +182,6 @@ lvalue: //ok
 
 rvalue:
         tNB {
-            //TODO: elevate
             int* ptr = push(&vec,getTempVarName());
             fprintf(file,"AFC %p #%i\n",ptr,$1);
             $$=ptr;
@@ -189,28 +200,45 @@ rvalue:
     |
         lvalue
     |
-        rvalue tADD rvalue {
+        {
             int* ptr = push(&vec,getTempVarName());
+            elevate(&vec);
+        }
+        rvalue tADD rvalue {
             fprintf(file,"ADD %p %p %p\n",ptr,$1,$3);
             $$=ptr;
+            delevate(&vec);
         }
     |
-        rvalue tSUB rvalue {
+    
+        {
             int* ptr = push(&vec,getTempVarName());
+            elevate(&vec);
+        }
+        rvalue tSUB rvalue {
             fprintf(file,"SUB %p %p %p\n",ptr,$1,$3);
             $$=ptr;
+            delevate(&vec);
         }
     |
-        rvalue tMUL rvalue {
+        {
             int* ptr = push(&vec,getTempVarName());
+            elevate(&vec);
+        }
+        rvalue tMUL rvalue {
             fprintf(file,"MUL %p %p %p\n",ptr,$1,$3);
             $$=ptr;
+            delevate(&vec);
         }
     |
-        rvalue tDIV rvalue {
+        {
             int* ptr = push(&vec,getTempVarName());
+            elevate(&vec);
+        }
+        rvalue tDIV rvalue {
             fprintf(file,"DIV %p %p %p\n",ptr,$1,$3);
             $$=ptr;
+            delevate(&vec);
         }
     |
         rvalue tOPE rvalue {
