@@ -6,7 +6,7 @@
 
 %right tEQ
 %left tADD tSUB
-%left tMUL tDIV
+%left tMUL tDIV tOPE
 
 //TODO: test dangling elses
 //FIXME: elevate around rvalues !
@@ -178,11 +178,11 @@ lvalue: //ok
                 exit(1);
             }
         }
-    //|
-    //    tID tOSB rvalue tCSB {
-    //        fprintf(stderr,"Not implemented a[i]: (%i)",__LINE__);
-    //        exit(1);
-    //    }
+    |
+        tID tOSB rvalue tCSB {
+            fprintf(stderr,"Not implemented a[i]: (%i)",__LINE__);
+            exit(1);
+        }
     ;
 
 rvalue:
@@ -192,11 +192,11 @@ rvalue:
             $$=ptr;
         }
     |
-        tADD rvalue { //+10 conflits de canard ???
+        tADD rvalue { //+10 conflits ?
             $$=$2;
         } %prec'*'
     |
-        tSUB rvalue { //+10 conflits de canard ???
+        tSUB rvalue { //+10 conflits ?
             int* ptr = push(&vec,getTempVarName());
             fprintf(file,"AFC %p #0\n",ptr);
             fprintf(file,"SUB %p %p %p\n",ptr,ptr,$2);
