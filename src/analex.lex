@@ -9,6 +9,7 @@
 #include "y.tab.h"
 //TODO: manually parse exponent notation !
 //FIXME: i+1 does not work (+1 is a number)
+#define printf(...) {}
 #define NAME_RET(x)  {printf(" " #x); return x;}
 #define VALUE_RET_ID(x) {printf(" " #x "[%s]",yytext); yylval.id=strdup(yytext); return x;}
 #define VALUE_RET_NB(x) {printf(" " #x "[%s]",yytext); yylval.nb=(int)strtold(yytext,NULL); return x;}
@@ -54,6 +55,9 @@ NAME [a-zA-Z_][a-zA-Z0-9_]*
 .                           { printf(" ERROR[%s]\n",yytext); exit(2); }
 %%
 
+#ifndef DEBUG_LEX
+#undef printf
+#endif
 // int main(void) {
 // 	yylex();
 //     return 0;
