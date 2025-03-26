@@ -4,6 +4,10 @@
 
 %token tEQ tOB tCB tSEM tCOMMA tWHILE tVOID tIF tOP tCP tMAIN tELSE tOSB tCSB tADD tSUB tMUL tDIV
 
+%token <nb> tNB
+%token <id> tID tTYPE tOPE
+%type <ptr> rvalue lvalue
+
 %right tEQ
 %left tADD tSUB
 %left tMUL tDIV tOPE
@@ -29,9 +33,6 @@ int while_height = 0;
 
 %}
 
-%token <nb> tNB
-%token <id> tID tTYPE tOPE
-%type <ptr> rvalue lvalue
 
 %%
 
