@@ -26,8 +26,6 @@ typedef struct
 } vector;
 */
 
-// FIXME: why no c++ ? (à tester)
-
 void doubleVecSize(vector* vec) {
     unsigned newcapa = vec->capacity * 2;
     cell* ptr = malloc(newcapa*sizeof(cell));
@@ -48,8 +46,8 @@ vector newVector(){
     return v;
 }
 int* push(vector* vec,char* ID){
-#ifdef DEBUG_VEC
-    printf("vec(%i/%i) id %s (%i) pushed\n",vec->size+1,vec->capacity,ID,vec->max_height);
+#ifdef DEBUG_VEC_SIZE
+    fprintf(stderr,"vec(%i/%i) id %s (%i) pushed",vec->size+1,vec->capacity,ID,vec->max_height);
 #endif // DEBUG_VEC
     assert(ID != NULL && strlen(ID) > 0 && "ID VIDE !");
     if (vec->size == vec->capacity)
@@ -57,6 +55,9 @@ int* push(vector* vec,char* ID){
 
     char* ptr = malloc(256);
     strncpy(ptr,ID,255);
+#ifdef DEBUG_VEC
+    fprintf(stderr,"Pushing %s (%p) -> %p\n",ptr,ptr,sp);
+#endif // DEBUG_VEC
     cell data = {ptr,vec->max_height,sp++,INT};
     vec->cells[vec->size++] = data;
     return data.ptr;
@@ -70,15 +71,25 @@ void delevate(vector* vec)
 {
     unsigned new_height = vec->max_height - 1;
     vec->max_height = new_height;
-    for(int i = 0;i<vec->capacity;++i) {
+    fprintf(stderr,"Delevating, nh:%i {\n",new_height);
+    for(int i = 0;i<vec->size;++i) {
         if (vec->cells[i].height > new_height) {
-            for(int j=i;j<vec->size;++j)
+            for(int j=i;j<vec->size;++j){
+                fprintf(stderr,"\t\e[31mh:%i, ptr:%p (%s)\e[0m\n",vec->cells[j].height,vec->cells[j].id,vec->cells[j].id);
                 free(vec->cells[j].id);
+            }
             sp -= vec->size - i;
             vec->size = i;
+            fprintf(stderr, "}\n");
             return;
         }
+         else {
+            fprintf(stderr,"\t\e[36mh:%i, ptr:%p (%s)\e[0m\n",vec->cells[i].height,vec->cells[i].id,vec->cells[i].id);
+
+        }
     }
+
+    fprintf(stderr, "}\n");
 }
 
 // void setVectorSize(void** data, unsigned* currentSize, unsigned newSize,char copy)

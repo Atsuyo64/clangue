@@ -16,7 +16,6 @@
 %left tMUL tDIV tOPE
 
 //TODO: test dangling elses
-//FIXME: elevate around rvalues !
 
 %{
 #include "stdio.h"
@@ -125,7 +124,7 @@ while:
             fprintf(file,"JMP %s\n",getCurrentWhileStartFlag());
             fprintf(file,"%s:\n",endWhile());
             delevate(&vec);
-        }tELSE
+        }
     ;
 
 if:
@@ -196,16 +195,16 @@ rvalue:
             $$=ptr;
         }
     |
-        tADD rvalue { //+10 conflits ?
+        tADD rvalue {
             $$=$2;
         } 
     |
-        tSUB rvalue { //+10 conflits ?
+        tSUB rvalue {
             int* ptr = push(&vec,getTempVarName());
             fprintf(file,"AFC %p #0\n",ptr);
             fprintf(file,"SUB %p %p %p\n",ptr,ptr,$2);
             $$=ptr;
-        } 
+        }
     |
         lvalue
     |
@@ -279,15 +278,15 @@ void yyerror(char *s) {
     fprintf(stderr, "%s\n", s) ;
 }
 
-int main(int argv, char** argc){
+int main(int argc, char** argv){
     vec = newVector();
-    if(argv==1){
+    if(argc==1){
         printf("WRITING TO STDOUT\n");
         file = stdout;
     }
     else
-        file = fopen(argc[1],"w");
-    yydebug = 1;
+        file = fopen(argv[1],"w");
+    yydebug = argc > 2;
     int ret =  yyparse();
     if (file != stdout)
         fclose(file);
