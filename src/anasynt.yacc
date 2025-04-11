@@ -116,7 +116,7 @@ while:
         }
         tOP {elevate(&vec);} rvalue {delevate(&vec);} tCP
         {
-            fprintf(file,"NOZ %s\n",$5);
+            fprintf(file,"NOZ %p\n",$5);
             fprintf(file,"JMF %s\n",getCurrentWhileEndFlag());
         }
         statement

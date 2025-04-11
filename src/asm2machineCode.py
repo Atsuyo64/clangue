@@ -42,7 +42,11 @@ for line in src.readlines():
         if args[0] not in instructions.keys():
             print("Unknown instruction: "+args[0])
             break
-        
+
+
+# ADD 0x1 0x2 0x3
+# ++++++++ 00000001 00000010 00000011 
+
 
 src.close()
 out.close()
