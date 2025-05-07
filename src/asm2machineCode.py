@@ -15,7 +15,7 @@ instructions = {
     "LDR":11, #LDR @reg @mem
 }
 
-##NOTE TO SELF: ADD A B C ≡ A := B + C
+##NOTE: ADD A B C ≡ A := B + C
 
 ##TODO: diviser addresses
 
@@ -34,9 +34,17 @@ def print_hexa(hexa):
             break
     print(f"{op} {(hexa>>16)&0xff:02} {(hexa>>8)&0xff:02} {(hexa>>0)&0xff:02}")
 
+def append_nop(count):
+    for i in range(count):
+        #print_hexa(0)
+        assert 13 == out.write(f'x"00000000",\n')
+
 def append_instruction(hexa):
+    global instr_counter
     print_hexa(hexa)
     assert 13 == out.write(f'x"{hexa:08x}",\n')
+    append_nop(4)
+    instr_counter+=5
 
 def print_instr(hexa):
     print(f'x"{hexa:08x}",')
@@ -78,29 +86,26 @@ for line in src.readlines():
             if len(args) != 4:
                 print("Error at line "+line+": incorrect num of args")
                 break
-            A,B,C = [int(x,16) for x in args[1:]]
+            A,B,C = [int(x,16)//8 for x in args[1:]]
             append_load(1,B)
             append_load(2,C)
             append_instruction(opcode<<24 | 0<<16 | 1<<8 | 2<<0)
             append_store(0,A)
-            instr_counter+=4
         elif args[0] == "COP":
             if len(args) != 3:
                 print("Error at line "+line)
                 break
-            A,B = [int(x,16) for x in args[1:]] # A <- B
+            A,B = [int(x,16)//8 for x in args[1:]] # A <- B
             append_load(1,B)
             # append_instruction(opcode<<24 | 0<<16 | 1<<8 | 0<<0)
             append_store(1,A)
-            instr_counter+=2
         elif args[0] == "AFC":
             if len(args) != 3:
                 print("Error at line "+line)
                 break
-            A,B = int(args[1],16), int(args[2][1:])
+            A,B = int(args[1],16)//8, int(args[2][1:])
             append_instruction(opcode<<24 | 0<<16 | B<<8 | 0<<0)
             append_store(0,A)
-            instr_counter+=2
         else:
             print("Not implemented instruction: "+args[0]+" at line "+line)
             break
