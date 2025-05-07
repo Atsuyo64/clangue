@@ -1,6 +1,7 @@
 import sys
 
 instructions = {
+    "NOP":0,
     "ADD":1,
     "MUL":2,
     "SUB":3,
@@ -20,11 +21,20 @@ labels = {}
 instr_counter = 0
 
 if len(sys.argv) != 3:
-    print("Incorrect args, usage python asm2machineCode.py [infile] [outfile]\nGot : "+sys.argv)
+    print("Incorrect args, usage python asm2machineCode.py [infile] [outfile]\nGot : "+str(sys.argv))
     sys.exit(1)
 
+def print_hexa(hexa):
+    op = ""
+    for k,v in instructions.items():
+        if hexa>>24 == v:
+            op = k
+            break
+    print(f"{op} {(hexa>>16)&0xff:02} {(hexa>>8)&0xff:02} {(hexa>>0)&0xff:02}")
+
 def append_instruction(hexa):
-    assert 12 == out.write(f'x"{hexa:08x}",')
+    print_hexa(hexa)
+    assert 13 == out.write(f'x"{hexa:08x}",\n')
 
 def print_instr(hexa):
     print(f'x"{hexa:08x}",')
@@ -32,12 +42,12 @@ def print_instr(hexa):
 def append_load(reg_num,addr):
     assert reg_num < 16
     assert addr < 256
-    print_instr(instructions["LDR"]<<24 | reg_num<<16 | addr<<8 | 0x00)
+    append_instruction(instructions["LDR"]<<24 | reg_num<<16 | addr<<8 | 0x00)
 
 def append_store(reg_num,addr):
     assert reg_num < 16
     assert addr < 256
-    print_instr(instructions["STR"]<<24 | addr<<16 | reg_num<<8 | 0x00)
+    append_instruction(instructions["STR"]<<24 | addr<<16 | reg_num<<8 | 0x00)
 
 try:
     src = open(sys.argv[1],"r")
@@ -45,7 +55,7 @@ except OSError as e:
     print("Could not open "+sys.argv[1],e)
     sys.exit(1)
 try:
-    out = open(sys.argv[2],"wb")
+    out = open(sys.argv[2],"w")
 except OSError as e:
     print("Could not open "+sys.argv[2],e)
     src.close()
