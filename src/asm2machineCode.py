@@ -17,6 +17,8 @@ instructions = {
 
 ##NOTE TO SELF: ADD A B C ≡ A := B + C
 
+##TODO: diviser addresses
+
 labels = {}
 instr_counter = 0
 
