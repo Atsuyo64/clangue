@@ -76,7 +76,7 @@ declarations:
         } 
         tEQ rvalue
         {
-            fprintf(file,"LOAD %p %p\n",pop_ptr(),$5); //FIXME: AFC -> LOAD
+            fprintf(file,"COP %p %p\n",pop_ptr(),$5); //FIXME: AFC -> COP
             delevate(&vec);
         }
     ;
@@ -97,7 +97,7 @@ declaration:
         } 
         tEQ rvalue
         {
-            fprintf(file,"LOAD %p %p\n",pop_ptr(),$4); //FIXME: AFC -> LOAD
+            fprintf(file,"COP %p %p\n",pop_ptr(),$4); //FIXME: AFC -> COP
             delevate(&vec);
         }
     ;
@@ -135,7 +135,7 @@ if:
         }
         tOP {elevate(&vec);} rvalue {delevate(&vec);} tCP 
         {
-            fprintf(file,"NOZ $5\n");
+            fprintf(file,"NOZ %p\n",$5);
             fprintf(file,"JMF %s\n",getCurrentIfElseFlag());
         }
         statement 
@@ -263,7 +263,7 @@ rvalue:
     |
         lvalue tEQ {elevate(&vec);} rvalue {
             delevate(&vec);
-            fprintf(file,"LOAD %p %p\n",$1,$4);
+            fprintf(file,"COP %p %p\n",$1,$4);
             $$=$1;
         }
     |
