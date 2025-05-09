@@ -72,6 +72,8 @@ except OSError as e:
     sys.exit(1)
 
 for line in src.readlines():
+    if line.startswith('\n') or line.startswith('#'):
+        continue
     if line.endswith('\n'):
         line = line[:-1]
     if line.endswith(':'):
