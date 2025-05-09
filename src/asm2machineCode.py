@@ -35,6 +35,7 @@ def print_hexa(hexa):
     print(f"{op} {(hexa>>16)&0xff:02} {(hexa>>8)&0xff:02} {(hexa>>0)&0xff:02}")
 
 def append_nop(count):
+    # return
     for i in range(count):
         #print_hexa(0)
         assert 13 == out.write(f'x"00000000",\n')
@@ -43,8 +44,9 @@ def append_instruction(hexa):
     global instr_counter
     print_hexa(hexa)
     assert 13 == out.write(f'x"{hexa:08x}",\n')
-    append_nop(4)
-    instr_counter+=5
+    # append_nop(4)
+    # instr_counter+=5
+    instr_counter+=1
 
 def print_instr(hexa):
     print(f'x"{hexa:08x}",')
