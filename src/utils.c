@@ -44,7 +44,7 @@ char* endWhile() {
         fprintf(stderr, "ERROR: IMPOSSIBLE TO CLOSE NON EXISTENT WHILE\n");
         exit(1);
     }   
-    char* endFlagName = getCurrentWhileStartFlag();
+    char* endFlagName = getCurrentWhileEndFlag();
     whileDepth--;
     return endFlagName;
 }
