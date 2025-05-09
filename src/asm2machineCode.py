@@ -50,12 +50,12 @@ def append_instruction(hexa):
     instr_counter+=1
 
 def append_jmp(opcode,label):
-    """For JMP and JMZ instructions"""
+    """For JMP and JMF instructions"""
     global instr_counter
     if opcode == instructions["JMP"]:
         print("JMP",label)
-    elif opcode == instructions["JMZ"]:
-        print("JMZ",label)
+    elif opcode == instructions["JMF"]:
+        print("JMF",label)
     else:
         print(f"Error: opcode {opcode} is not a jump instruction")
         return
