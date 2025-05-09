@@ -67,11 +67,26 @@ def print_code(line_num):
         print_line(line)
     print()
 
+def print_few_lines(center_line,size=3):
+    mini = center_line - size
+    maxi = center_line + size + 1
+    if mini < 0:
+        maxi -= mini
+        mini = 0
+    maxi = min(maxi,len(lines))
+    for i in range(mini,maxi):
+        if i == center_line:
+            print(f">{i:3}: ",end='')
+        else:
+            print(f" {i:3}: ",end='')
+        print_line(lines[i])
+    print()
 
 reg_mem = [0 for _ in range(16)]
 data_mem = [0 for _ in range(256)]
 flag = False
 line_num = 0
+print_whole_code = True
 
 def exec_line():
     global line_num
@@ -79,6 +94,8 @@ def exec_line():
     global reg_mem
     global data_mem
     global lines
+    if line_num >= len(lines):
+        return
     line = lines[line_num]
     if line[0] == "ADD":
         reg_mem[line[1]] = (reg_mem[line[2]] + reg_mem[line[3]])%256
@@ -125,20 +142,29 @@ def print_data():
         print()
 
 def print_reg():
+    global flag
+    global reg_mem
     for i in range(16):
-        print(f"{reg_mem[i]:2x} ",end='')
+        print(f"r{i:<2}|",end='')
     print()
+    for i in range(16):
+        print(f"{reg_mem[i]:2x} |",end='')
+    print()
+    print(f"NOZ: "+str(flag))
 
 print_code(line_num)
 while True:
-    command = input("[D]ata, [R]eg, [L]ist, [C]ontinue, [E]xit: (default: C)" )
+    command = input("[D]ata, [R]eg, [L]ist, [T]oggle_whole_code, [C]ontinue, [E]xit: (default: C)" )
     if len(command) == 0:
         command = "C"
     else:
         command = command[0].capitalize()
     if command == "C":
         exec_line()
-        print_code(line_num)
+        if print_whole_code:
+            print_code(line_num)
+        else:
+            print_few_lines(line_num)
     elif command == "D":
         print_data()
     elif command == "R":
@@ -146,4 +172,9 @@ while True:
     elif command == "E":
         break
     elif command == "L":
-        print_code(line_num)
+        if print_whole_code:
+            print_few_lines(line_num)
+        else:
+            print_code(line_num)
+    elif command == "T":
+        print_whole_code = not print_whole_code
