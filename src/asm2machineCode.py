@@ -17,8 +17,6 @@ instructions = {
 
 ##NOTE: ADD A B C ≡ A := B + C
 
-##TODO: diviser addresses
-
 labels = {}
 instr_counter = 0
 
@@ -35,10 +33,13 @@ def print_hexa(hexa):
     print(f"{op} {(hexa>>16)&0xff:02} {(hexa>>8)&0xff:02} {(hexa>>0)&0xff:02}")
 
 def append_nop(count):
+    global instr_counter
     # return
     for i in range(count):
         #print_hexa(0)
         assert 13 == out.write(f'x"00000000",\n')
+        instr_counter+=1
+
 
 def append_instruction(hexa):
     global instr_counter
@@ -47,6 +48,19 @@ def append_instruction(hexa):
     # append_nop(4)
     # instr_counter+=5
     instr_counter+=1
+
+def append_jmp(opcode,label):
+    """For JMP and JMZ instructions"""
+    global instr_counter
+    if opcode == instructions["JMP"]:
+        print("JMP",label)
+    elif opcode == instructions["JMZ"]:
+        print("JMZ",label)
+    else:
+        print(f"Error: opcode {opcode} is not a jump instruction")
+        return
+    out.write(f'x"{opcode:02x}{label}",\n')
+    instr_counter += 1
 
 def print_instr(hexa):
     print(f'x"{hexa:08x}",')
@@ -117,12 +131,28 @@ for line in src.readlines():
             B = int(args[1],16)//4
             append_load(3,B)
             append_instruction(opcode<<24 | 0<<16 | 3<<8 | 0<<0)
+        elif args[0] == "JMP" or args[0] == "JMF":
+            if len(args) != 2:
+                print("Error at line "+line)
+                break
+            label = args[1]
+            append_jmp(opcode,label)
         else:
             print("Not implemented instruction: "+args[0]+" at line "+line)
             break
 
 src.close()
 
-
-
 out.close()
+
+final_code = ""
+with open(sys.argv[2],"r") as almost_done_file:
+    final_code = ''.join(almost_done_file.readlines())
+
+for k,v in labels.items():
+    # value = f'@@0000'
+    value = f'{v:02x}0000'
+    final_code = final_code.replace(k,value)
+
+with open(sys.argv[2],"w") as final_file:
+    final_file.writelines(final_code)
