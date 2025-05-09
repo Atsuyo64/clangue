@@ -108,6 +108,13 @@ for line in src.readlines():
             A,B = int(args[1],16)//4, int(args[2][1:])
             append_instruction(opcode<<24 | 0<<16 | B<<8 | 0<<0)
             append_store(0,A)
+        elif args[0] == "NOZ":
+            if len(args) != 2:
+                print("Error at line "+line)
+                break
+            B = int(args[1],16)//4
+            append_load(3,B)
+            append_instruction(opcode<<24 | 0<<16 | 3<<8 | 0<<0)
         else:
             print("Not implemented instruction: "+args[0]+" at line "+line)
             break
