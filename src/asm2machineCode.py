@@ -88,7 +88,7 @@ for line in src.readlines():
             if len(args) != 4:
                 print("Error at line "+line+": incorrect num of args")
                 break
-            A,B,C = [int(x,16)//8 for x in args[1:]]
+            A,B,C = [int(x,16)//4 for x in args[1:]]
             append_load(1,B)
             append_load(2,C)
             append_instruction(opcode<<24 | 0<<16 | 1<<8 | 2<<0)
@@ -97,7 +97,7 @@ for line in src.readlines():
             if len(args) != 3:
                 print("Error at line "+line)
                 break
-            A,B = [int(x,16)//8 for x in args[1:]] # A <- B
+            A,B = [int(x,16)//4 for x in args[1:]] # A <- B
             append_load(1,B)
             # append_instruction(opcode<<24 | 0<<16 | 1<<8 | 0<<0)
             append_store(1,A)
@@ -105,7 +105,7 @@ for line in src.readlines():
             if len(args) != 3:
                 print("Error at line "+line)
                 break
-            A,B = int(args[1],16)//8, int(args[2][1:])
+            A,B = int(args[1],16)//4, int(args[2][1:])
             append_instruction(opcode<<24 | 0<<16 | B<<8 | 0<<0)
             append_store(0,A)
         else:
