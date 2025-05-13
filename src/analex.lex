@@ -16,8 +16,7 @@
 #endif //DEBUG_LEX
 
 %}
-
-%option noyywrap
+%option noyywrap yylineno
 D   [0-9]
 INT {D}+("e"{D}+)?
 OPE [&|\^<>]|"=="|"<="|">="|"!="|"<<"|">>"
@@ -51,7 +50,7 @@ NAME [a-zA-Z_][a-zA-Z0-9_]*
 {NAME}                      VALUE_RET_ID(tID)
 " "                         { }
 \t                          { }
-\n                          { ++yylineno; }
+\n                          { /*++yylineno;*/ }
 .                           { printf(" ERROR[%s]\n",yytext); exit(2); }
 %%
 

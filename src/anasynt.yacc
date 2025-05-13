@@ -31,8 +31,7 @@ extern int yylineno;
 extern char *yytext;
 
 void yyerror(const char *s) {
-    fprintf(stderr, "Y a une saucisse dans mon cassoulet !\nErreur à la con à la ligne %d putaingue, près de \"%s\": %s\n",
-            yylineno, yytext, s);
+    fprintf(stderr, "Y a une saucisse dans mon cassoulet !\nErreur à la con à la ligne %d putaingue, près de \"%s\": %s\n", yylineno, yytext, s);
 }
 
 FILE* file;
@@ -47,11 +46,21 @@ int while_height = 0;
 %%
 
 program:
-        tMAIN tOP tCP body 
+        tMAIN tOP tCP body
+        |
+        tMAIN tOP tCP body error { // FIXME: marche pas snif
+            yyerror("Missing '}' at end of main");
+            yyerrok;
+        }
     ;
 
 body:
-        tOB {elevate(&vec);} expressions tCB {delevate(&vec);} 
+        tOB {elevate(&vec);} expressions tCB {delevate(&vec);}
+        |
+        tOB {elevate(&vec);} expressions tCB error { // FIXME: marche pas snif
+            yyerror("Missing '}' at end of body");
+            yyerrok;
+        }
     ;
 
 expressions: 
