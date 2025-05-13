@@ -51,7 +51,7 @@ NAME [a-zA-Z_][a-zA-Z0-9_]*
 {NAME}                      VALUE_RET_ID(tID)
 " "                         { }
 \t                          { }
-\n                          { }
+\n                          { ++yylineno; }
 .                           { printf(" ERROR[%s]\n",yytext); exit(2); }
 %%
 
