@@ -26,7 +26,15 @@
 #define YYDEBUG 1
 
 extern int yylex (void);
-void yyerror(char *s); //
+void yyerror(const char *s); //
+extern int yylineno;
+extern char *yytext;
+
+void yyerror(const char *s) {
+    fprintf(stderr, "Y a une saucisse dans mon cassoulet !\nErreur à la con à la ligne %d putaingue, près de \"%s\": %s\n",
+            yylineno, yytext, s);
+}
+
 FILE* file;
 vector vec;
 TYPE currentType = INT;
@@ -274,9 +282,9 @@ rvalue:
 
 %%
 
-void yyerror(char *s) {
+/* void yyerror(char *s) {
     fprintf(stderr, "%s\n", s) ;
-}
+} */
 
 int main(int argc, char** argv){
     vec = newVector();
