@@ -1,3 +1,7 @@
+"""
+R.I.C.A.R.D. : Renverse Ingenierie Clangue Assembleur Raisingue Debuggeur
+"""
+
 import sys
 
 instructions = {

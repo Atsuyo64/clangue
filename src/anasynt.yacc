@@ -47,20 +47,20 @@ int while_height = 0;
 
 program:
         tMAIN tOP tCP body
-        |
+        /* |
         tMAIN tOP tCP body error { // FIXME: marche pas snif
             yyerror("Missing '}' at end of main");
             yyerrok;
-        }
+        } */
     ;
 
 body:
         tOB {elevate(&vec);} expressions tCB {delevate(&vec);}
-        |
+        /* |
         tOB {elevate(&vec);} expressions tCB error { // FIXME: marche pas snif
             yyerror("Missing '}' at end of body");
             yyerrok;
-        }
+        } */
     ;
 
 expressions: 
