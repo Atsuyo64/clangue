@@ -223,17 +223,17 @@ rvalue:
             $$=ptr;
         }
     |
+        lvalue
+    |
         tREADSW tOP {
                 push_ptr(push(&vec,getTempVarName()));
                 elevate(&vec);
-            } rvalue {
+            } rvalue tCP {
                 int* ptr = pop_ptr();
                 fprintf(file,"GSW %p %p\n",$4, ptr);
                 $$=ptr;
                 delevate(&vec);
-            } tCP
-    |
-        lvalue
+            }
     |
         rvalue tADD
         {

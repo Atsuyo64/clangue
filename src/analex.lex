@@ -46,7 +46,7 @@ NAME [a-zA-Z_][a-zA-Z0-9_]*
 "for"                       NAME_RET(tFOR)
 "void"                      NAME_RET(tVOID)
 "printf"                    NAME_RET(tPRINTF)
-"readSwitch"                NAME_RET(tREADSW)
+"read_switch"               NAME_RET(tREADSW)
 {TYPE}                      VALUE_RET_ID(tTYPE)
 "("                         NAME_RET(tOP)
 ")"                         NAME_RET(tCP)
