@@ -44,6 +44,7 @@ NAME [a-zA-Z_][a-zA-Z0-9_]*
 "else"                      NAME_RET(tELSE)
 "while"                     NAME_RET(tWHILE)
 "void"                      NAME_RET(tVOID)
+"return"                    NAME_RET(tRETURN)
 {TYPE}                      VALUE_RET_ID(tTYPE)
 "("                         NAME_RET(tOP)
 ")"                         NAME_RET(tCP)
