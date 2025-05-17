@@ -2,7 +2,7 @@
 
 %union {int nb;char* id;int* ptr;}
 
-%token tEQ tOB tCB tSEM tCOMMA tWHILE tRETURN tIF tOP tCP tMAIN tELSE tOSB tCSB tADD tSUB tMUL tDIV
+%token tEQ tOB tCB tSEM tCOMMA tWHILE tVOID tRETURN tIF tOP tCP tMAIN tELSE tOSB tCSB tADD tSUB tMUL tDIV
 
 %token <nb> tNB
 %token <id> tID tTYPE tOPE
@@ -46,12 +46,13 @@ int while_height = 0;
 %%
 
 program:
-        function_list tMAIN tOP tCP body
-        /* |
-        tMAIN tOP tCP body error { // FIXME: marche pas snif
-            yyerror("Missing '}' at end of main");
-            yyerrok;
-        } */
+        function_list main_def
+    ;
+
+main_def:
+        tTYPE tMAIN tOP tCP body {
+            fprintf(file, "# Function main\n");
+        }
     ;
 
 function_list:
@@ -61,6 +62,10 @@ function_list:
 
 function_def:
         tTYPE tID tOP params tCP body {
+            if (strcmp($1, "int") != 0) {
+                yyerror("Only 'int' return type is allowed");
+                exit(1);
+            }
             // TODO: handle it and its params
             fprintf(file, "# Function %s\n", $2);
         }
