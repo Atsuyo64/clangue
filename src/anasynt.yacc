@@ -2,7 +2,7 @@
 
 %union {int nb;char* id;int* ptr;}
 
-%token tEQ tOB tCB tSEM tCOMMA tWHILE tFOR tVOID tPRINTF tIF tOP tCP tMAIN tELSE tOSB tCSB tADD tSUB tMUL tDIV tREADSW1 tREADSW2 tREADSW3 tREADSW4
+%token tEQ tOB tCB tSEM tCOMMA tWHILE tFOR tVOID tPRINTF tIF tOP tCP tMAIN tELSE tOSB tCSB tADD tSUB tMUL tDIV tREADSW
 
 %token <nb> tNB
 %token <id> tID tTYPE tOPE
@@ -187,22 +187,22 @@ statement:
 // TODO: *(ptr + 1)
 // TODO: 13[ptr]
 lvalue: //ok
-        tID {
-            cell* data;
-            if(data = find(&vec,$1)) {
-                $$=data->ptr;
-            }
-            else{
-                fprintf(stderr,"Undef symbol %s at line '%i'",$1,__LINE__);
-                fprintf(file,"Undef symbol %s at line '%i'",$1,__LINE__);
-                exit(1);
-            }
+    tID {
+        cell* data;
+        if(data = find(&vec,$1)) {
+            $$=data->ptr;
         }
-    |
-        tID tOSB rvalue tCSB {
-            fprintf(stderr,"Not implemented a[i]: (%i)",__LINE__);
+        else{
+            fprintf(stderr,"Undef symbol %s at line '%i'",$1,__LINE__);
+            fprintf(file,"Undef symbol %s at line '%i'",$1,__LINE__);
             exit(1);
         }
+    }
+    |
+    tID tOSB rvalue tCSB {
+        fprintf(stderr,"Not implemented a[i]: (%i)",__LINE__);
+        exit(1);
+    }
     ;
 
 rvalue:
@@ -222,6 +222,16 @@ rvalue:
             fprintf(file,"SUB %p %p %p\n",ptr,ptr,$2);
             $$=ptr;
         }
+    |
+        tREADSW tOP {
+                push_ptr(push(&vec,getTempVarName()));
+                elevate(&vec);
+            } rvalue {
+                int* ptr = pop_ptr();
+                fprintf(file,"GSW %p %p\n",$4, ptr);
+                $$=ptr;
+                delevate(&vec);
+            } tCP
     |
         lvalue
     |
