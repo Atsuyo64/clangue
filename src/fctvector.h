@@ -1,21 +1,17 @@
 #pragma once
 
-typedef struct
-{
-    char *id;
-    int *ptr;
-} fct_cell;
+typedef struct {
+    char *name;
+    int address; // starting addr
+    int param_count;
+} function_entry;
 
-typedef struct
-{
-    fct_cell *cells;
-    unsigned capacity;
-    unsigned size;
-} fct_vector;
+typedef struct {
+    function_entry *entries;
+    int size;
+    int capacity;
+} function_table;
 
-fct_vector newFctVector();
-int* fctAdd(fct_vector *vec, char* ID);
-fct_cell *findFct(fct_vector *v, char *id);
-
-void push_fct_ptr(int* ptr);
-int* pop_fct_ptr();
+function_table *newFunctionTable();
+void ft_add(function_table *ft, char *name, int address, int param_count);
+function_entry *ft_get(function_table *ft, char *name);

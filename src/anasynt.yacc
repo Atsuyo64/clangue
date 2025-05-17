@@ -20,6 +20,7 @@
 %{
 #include "stdio.h"
 #include "vector.h"
+#include "fctvector.h"
 #include "stdlib.h" //exit
 #include "utils.h"
 
@@ -36,6 +37,11 @@ void yyerror(const char *s) {
 
 FILE* file;
 vector vec;
+
+function_table functions;
+char *param_names[64];
+int param_count;
+
 TYPE currentType = INT;
 int if_height = 0;
 int while_height = 0;
@@ -330,6 +336,7 @@ rvalue:
 
 int main(int argc, char** argv){
     vec = newVector();
+    functions = newFunctionTable()
     if(argc==1){
         printf("WRITING TO STDOUT\n");
         file = stdout;
