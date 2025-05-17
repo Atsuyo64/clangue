@@ -2,7 +2,7 @@
 
 %union {int nb;char* id;int* ptr;}
 
-%token tEQ tOB tCB tSEM tCOMMA tWHILE tVOID tPRINTF tIF tOP tCP tMAIN tELSE tOSB tCSB tADD tSUB tMUL tDIV
+%token tEQ tOB tCB tSEM tCOMMA tWHILE tFOR tVOID tPRINTF tIF tOP tCP tMAIN tELSE tOSB tCSB tADD tSUB tMUL tDIV tREADSW1 tREADSW2 tREADSW3 tREADSW4
 
 %token <nb> tNB
 %token <id> tID tTYPE tOPE
