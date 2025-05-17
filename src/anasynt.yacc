@@ -104,6 +104,8 @@ expression:
         {elevate(&vec);} rvalue {delevate(&vec);}
     |
         declarations
+    |
+        tRETURN rvalue tSEM {fprintf(file, "RET %p\n", $2); }
     ;
 
 declarations:
