@@ -2,7 +2,7 @@
 
 %union {int nb;char* id;int* ptr;}
 
-%token tEQ tOB tCB tSEM tCOMMA tWHILE tVOID tIF tOP tCP tMAIN tELSE tOSB tCSB tADD tSUB tMUL tDIV
+%token tEQ tOB tCB tSEM tCOMMA tWHILE tVOID tPRINTF tIF tOP tCP tMAIN tELSE tOSB tCSB tADD tSUB tMUL tDIV
 
 %token <nb> tNB
 %token <id> tID tTYPE tOPE
@@ -14,8 +14,6 @@
 %right tEQ
 %left tADD tSUB
 %left tMUL tDIV tOPE
-
-//TODO: test dangling elses
 
 %{
 #include "stdio.h"
@@ -73,6 +71,8 @@ expressions:
 
 expression:
         {elevate(&vec);} rvalue {delevate(&vec);}
+    |
+        tPRINTF tOP {elevate(&vec);} rvalue {fprintf(file,"PRT %p\n",$4); delevate(&vec);} tCP 
     |
         declarations
     ;
