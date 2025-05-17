@@ -2,7 +2,7 @@
 
 typedef struct {
     char *name;
-    int address; // starting addr
+    // int address; // starting addr not used
     int param_count;
 } function_entry;
 
@@ -13,5 +13,6 @@ typedef struct {
 } function_table;
 
 function_table *newFunctionTable();
-void ft_add(function_table *ft, char *name, int address, int param_count);
+void ft_add(function_table *ft, char *name, int param_count);
 function_entry *ft_get(function_table *ft, char *name);
+char* getFctName(char* name);

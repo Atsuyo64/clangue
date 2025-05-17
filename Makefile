@@ -14,7 +14,7 @@ testlex:
 yacc:# build/src/vector.o build/src/utils.o
 	yacc -o build/y.tab.c -d -g -t -v src/anasynt.yacc
 	flex -o build/lex.yy.c src/analex.lex
-	gcc $(INCLUDE) build/y.tab.c build/lex.yy.c src/vector.c src/utils.c -o build/yacc.out
+	gcc $(INCLUDE) build/y.tab.c build/lex.yy.c src/vector.c src/fctvector.c src/utils.c -o build/yacc.out
 
 testyacc: yacc
 	build/yacc.out < tests/correct-examples/basic.c

@@ -6,7 +6,7 @@
 
 %token <nb> tNB
 %token <id> tID tTYPE tOPE
-%type <ptr> rvalue lvalue
+%type <ptr> rvalue lvalue function_call function_args
 
 %nonassoc REDUCE 
 %nonassoc tELSE
@@ -38,7 +38,7 @@ void yyerror(const char *s) {
 FILE* file;
 vector vec;
 
-function_table functions;
+function_table* functions;
 char *param_names[64];
 int param_count;
 
@@ -56,7 +56,7 @@ program:
     ;
 
 main_def:
-        tTYPE tMAIN tOP tCP body {
+        tVOID tMAIN tOP tCP body {
             fprintf(file, "# Function main\n");
         }
     ;
@@ -67,15 +67,78 @@ function_list:
   ;
 
 function_def:
-        tTYPE tID tOP params tCP body {
-            if (strcmp($1, "int") != 0) {
-                yyerror("Only 'int' return type is allowed");
-                exit(1);
-            }
-            // TODO: handle it and its params
-            fprintf(file, "# Function %s\n", $2);
+    tTYPE tID tOP params tCP body {
+        if (strcmp($1, "int") != 0) {
+            yyerror("Only 'int' return type is allowed");
+            exit(1);
         }
-    ;
+
+        // sotre fct in table
+        // int start_addr = current_instruction_index();
+        ft_add(functions, $2, /*start_addr,*/ param_count);
+
+        fprintf(file, "%s:\n", getFctName($2));
+
+        elevate(&vec);
+
+        push(&vec, "#val_ret");
+        for (int i = 0; i < param_count; ++i) {
+            push(&vec, param_names[i]); // params
+        }
+        push(&vec, "@ret");
+
+        // flush symboles
+        delevate(&vec);
+    }
+;
+
+function_call:
+    tID tOP function_args tCP {
+        fprintf(file, "JMP %s\n", getFctName($1));
+
+        elevate(&vec);
+
+        // ret val
+        int *ret_val_ptr = push(&vec, getTempVarName());
+
+        // Params `function_args`
+
+        // add sapce for ret addr
+        int *ret_addr = push(&vec, "@ret");
+
+        // jmp to fct
+        function_entry *f = ft_get(functions, $1);
+        if (!f) {
+            yyerror("Unknown function");
+            exit(1);
+        }
+
+        fprintf(file, "JMP @%s\n", getFctName($1));
+        fprintf(file, "POP %p\n", ret_val_ptr);
+
+        $$ = ret_val_ptr;
+
+        delevate(&vec);
+    }
+;
+
+function_args:
+    /* empty */ { param_count = 0; }
+  |
+    rvalue { 
+        param_count = 1;
+        param_names[0] = getTempVarName();
+        int *ptr = push(&vec, param_names[0]);
+        fprintf(file, "PARAM %p\n", $1);
+    }
+  |
+    rvalue tCOMMA function_args {
+        param_names[param_count] = getTempVarName();
+        int *ptr = push(&vec, param_names[param_count]);
+        fprintf(file, "PARAM %p\n", $1);
+        param_count++;
+    }
+;
 
 params:
         /* empty */
@@ -324,6 +387,8 @@ rvalue:
         }
     |
         tOP rvalue tCP {$$=$2;}
+    |
+        function_call { $$ = $1; }
     ; 
 
 
@@ -336,7 +401,7 @@ rvalue:
 
 int main(int argc, char** argv){
     vec = newVector();
-    functions = newFunctionTable()
+    functions = newFunctionTable();
     if(argc==1){
         printf("WRITING TO STDOUT\n");
         file = stdout;
