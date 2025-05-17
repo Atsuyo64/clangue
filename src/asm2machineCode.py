@@ -13,6 +13,8 @@ instructions = {
     "NOZ":9,
     "STR":10,
     "LDR":11, #LDR @reg @mem
+    "PRT":12,
+    "GSW":13,
 }
 
 ##NOTE: ADD A B C ≡ A := B + C
@@ -137,6 +139,21 @@ for line in src.readlines():
                 break
             label = args[1]
             append_jmp(opcode,label)
+        elif args[0] == "PRT":
+            if len(args) != 2:
+                print("Error at line "+line)
+                break
+            B = int(args[1],16)//4
+            append_load(7,B)
+            append_instruction(opcode<<24 | 0<<16 | 7<<8 | 0<<0)
+        elif args[0] == "GSW":
+            if len(args) != 3:
+                print("Error at line "+line)
+                break
+            A,B = [int(x,16)//4 for x in args[1:]] # A <- B
+            append_load(2,B)
+            append_instruction(opcode<<24 | 2<<16 | 1<<8 | 0<<0)
+            append_store(1,A)
         else:
             print("Not implemented instruction: "+args[0]+" at line "+line)
             break
