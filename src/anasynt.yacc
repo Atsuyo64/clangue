@@ -2,7 +2,7 @@
 
 %union {int nb;char* id;int* ptr;}
 
-%token tEQ tOB tCB tSEM tCOMMA tWHILE tVOID tIF tOP tCP tMAIN tELSE tOSB tCSB tADD tSUB tMUL tDIV
+%token tEQ tOB tCB tSEM tCOMMA tWHILE tRETURN tIF tOP tCP tMAIN tELSE tOSB tCSB tADD tSUB tMUL tDIV
 
 %token <nb> tNB
 %token <id> tID tTYPE tOPE
@@ -46,12 +46,36 @@ int while_height = 0;
 %%
 
 program:
-        tMAIN tOP tCP body
+        function_list tMAIN tOP tCP body
         /* |
         tMAIN tOP tCP body error { // FIXME: marche pas snif
             yyerror("Missing '}' at end of main");
             yyerrok;
         } */
+    ;
+
+function_list:
+    /* empty */
+  | function_list function_def
+  ;
+
+function_def:
+        tTYPE tID tOP params tCP body {
+            // TODO: handle it and its params
+            fprintf(file, "# Function %s\n", $2);
+        }
+    ;
+
+params:
+        /* empty */
+    |
+        tTYPE tID {
+            push(&vec, $2);
+        }
+    |
+        tTYPE tID tCOMMA params {
+            push(&vec, $2);
+        }
     ;
 
 body:
@@ -193,6 +217,8 @@ lvalue: //ok
                 $$=data->ptr;
             }
             else{
+                // yyerror("Undef symbol");
+                // yyerrok; //TODO: CHECK
                 fprintf(stderr,"Undef symbol %s at line '%i'",$1,__LINE__);
                 fprintf(file,"Undef symbol %s at line '%i'",$1,__LINE__);
                 exit(1);
