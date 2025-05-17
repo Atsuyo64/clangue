@@ -1,6 +1,6 @@
 """
 R.I.C.A.R.D. : Renverse Ingenierie Clangue Assembleur Raisingue Debuggeur
-Fonctionne sur jeu d'instructions BRAS : Binaire Raisingue Avancé Systèmes
+Fonctionne sur jeu d'instructions BAR : Binaire Avancé Raisingue
 """
 
 import sys

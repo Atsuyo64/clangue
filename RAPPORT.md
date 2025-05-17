@@ -31,7 +31,7 @@ Notre implémentation se démarque par ces différents aspects :
 - Aucun conflit (ni shift/reduce, ni reduce/reduce)
 - L'assembleur généré contient des déclarations de label, et les instructions de branchement (JMP et JMF) les utilisent. Cela rend l'assembleur beaucoup plus facile à lire. De plus, les numéros d'instruction vont changer lors de la phase suivante (voir l'explication dans la partie suivante).
 
-#### 3.1.2 Jeu d'instruction (*BRAS*)
+#### 3.1.2 Jeu d'instruction (*BAR*)
 
 En plus des instructions classiques (NOP, ADD, SUB, MUL, DIV, JMP, LDR, STR, AFC), notre jeu d'instruction contient également ces instructions et spécificités : 
 - Instruction `NOZ R1` : Met à jour le flag interne _NOZ_ := (R1 != 0)
