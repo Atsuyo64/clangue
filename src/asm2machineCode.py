@@ -140,12 +140,13 @@ for line in src.readlines():
             label = args[1]
             append_jmp(opcode,label)
         elif args[0] == "PRT":
-            if len(args) != 2:
+            if len(args) != 3:
                 print("Error at line "+line)
                 break
-            B = int(args[1],16)//4
-            append_load(7,B)
-            append_instruction(opcode<<24 | 0<<16 | 7<<8 | 0<<0)
+            A,B = [int(x,16)//4 for x in args[1:]]
+            append_load(7,A)
+            append_load(8,B)
+            append_instruction(opcode<<24 | 7<<16 | 8<<8 | 0<<0)
         elif args[0] == "GSW":
             if len(args) != 3:
                 print("Error at line "+line)

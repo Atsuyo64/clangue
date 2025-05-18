@@ -71,8 +71,10 @@ expressions:
 
 expression:
         {elevate(&vec);} rvalue {delevate(&vec);}
+    /* |
+        tPRINTF tOP {elevate(&vec);} rvalue {fprintf(file,"PRT %p\n",$4); delevate(&vec);} tCP  */
     |
-        tPRINTF tOP {elevate(&vec);} rvalue {fprintf(file,"PRT %p\n",$4); delevate(&vec);} tCP 
+        tPRINTF tOP {elevate(&vec);} rvalue tCOMMA rvalue {fprintf(file,"PRT %p %p\n",$4,$6); delevate(&vec);} tCP 
     |
         declarations
     ;
