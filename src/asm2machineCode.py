@@ -153,7 +153,7 @@ for line in src.readlines():
                 break
             A,B = [int(x,16)//4 for x in args[1:]] # A <- B
             append_load(2,B)
-            append_instruction(opcode<<24 | 0<<16 | 2<<8 | 1<<0)
+            append_instruction(opcode<<24 | 1<<16 | 2<<8 | 0<<0)
             append_store(1,A)
         else:
             print("Not implemented instruction: "+args[0]+" at line "+line)
