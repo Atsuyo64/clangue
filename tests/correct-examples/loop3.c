@@ -1,7 +1,7 @@
 main(){
     int a0 = 0;
     int stdout = 1;
-    int stdout2 = 1;
+    int stdout2 = 2;
     int a1, a2;
     while (1)
     {
