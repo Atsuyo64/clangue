@@ -146,7 +146,7 @@ for line in src.readlines():
             A,B = [int(x,16)//4 for x in args[1:]]
             append_load(7,A)
             append_load(8,B)
-            append_instruction(opcode<<24 | 7<<16 | 8<<8 | 0<<0)
+            append_instruction(opcode<<24 | 0<<16 | 8<<8 | 7<<0)
         elif args[0] == "GSW":
             if len(args) != 3:
                 print("Error at line "+line)
