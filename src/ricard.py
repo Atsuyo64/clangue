@@ -144,7 +144,7 @@ def exec_line():
     elif line[0] == "NOP":
         line_num += 1
     elif line[0] == "PRT":
-        print(f"PRINT {reg_mem[line[3]]} {line[2]:02x}")
+        print(f"PRINT {reg_mem[line[3]]} {reg_mem[line[2]]:02x}")
         printed = True
         line_num += 1
     elif line[0] == "GSW":

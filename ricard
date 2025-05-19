@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+if [ $# != 1 ]
+then
+    echo "Usage: $0 <binary>"
+    exit -1
+fi
+
+python3 src/ricard.py $1
