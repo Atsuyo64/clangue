@@ -216,6 +216,8 @@ lvalue:
                                );
         // fprintf(file, "AFC %p #%d\n", temp, p);
         fprintf(file, "COP %p %p\n", temp, p);
+        // fprintf(file, "LDR %p %p\n", temp, p);
+        // fprintf(file, "LRF %p %p\n", temp, p);
         $$ = temp;
     }
     |

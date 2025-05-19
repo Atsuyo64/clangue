@@ -15,6 +15,7 @@ instructions = {
     "LDR":11, #LDR @reg @mem
     "PRT":12,
     "GSW":13,
+    # "LRF":14, #Load Reference : LRF @dest *@src
 }
 
 ##NOTE: ADD A B C ≡ A := B + C
@@ -155,6 +156,14 @@ for line in src.readlines():
             append_load(2,A)
             append_instruction(opcode<<24 | 1<<16 | 2<<8 | 0<<0)
             append_store(1,B)
+        # elif args[0] == "LRF":
+        #     if len(args) != 3:
+        #         print("Error at line "+line)
+        #         break
+        #     A,B = [int(x,16)//4 for x in args[1:]] # A <- B
+        #     append_load(2,A)
+        #     append_instruction(opcode<<24 | 1<<16 | 2<<8 | 0<<0)
+        #     append_store(1,B)
         else:
             print("Not implemented instruction: "+args[0]+" at line "+line)
             break
