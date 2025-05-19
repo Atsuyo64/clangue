@@ -2,7 +2,7 @@
 
 %union {int nb;char* id;int* ptr;}
 
-%token tEQ tOB tCB tSEM tCOMMA tWHILE tFOR tVOID tPRINTF tIF tOP tCP tMAIN tELSE tOSB tCSB tADD tSUB tMUL tDIV tREADSW tESP
+%token tEQ tOB tCB tSEM tCOMMA tWHILE tFOR tVOID tPRINTF tIF tOP tCP tMAIN tELSE tOSB tCSB tADD tSUB tMUL tDIV tREADSW tESP tLE tGE tLT tGT tCEQ tNEQ
 
 %token <nb> tNB
 %token <id> tID tTYPE tOPE
@@ -16,6 +16,7 @@
 %left tESP
 %left tADD tSUB
 %left tMUL tDIV tOPE
+%left tLE tGE tLT tGT tCEQ tNEQ
 
 %{
 #include "stdio.h"
@@ -320,6 +321,78 @@ rvalue:
         rvalue {
             int* ptr = pop_ptr();
             fprintf(file,"DIV %p %p %p\n",ptr,$1,$4);
+            $$=ptr;
+            delevate(&vec);
+        }
+    |
+        rvalue tLE
+        {
+            push_ptr(push_value(&vec,getTempVarName()));
+            elevate(&vec);
+        }
+        rvalue {
+            int* ptr = pop_ptr();
+            fprintf(file,"CLE %p %p %p\n",ptr,$1,$4);
+            $$=ptr;
+            delevate(&vec);
+        }
+    |
+        rvalue tGE
+        {
+            push_ptr(push_value(&vec,getTempVarName()));
+            elevate(&vec);
+        }
+        rvalue {
+            int* ptr = pop_ptr();
+            fprintf(file,"LGE %p %p %p\n",ptr,$1,$4);
+            $$=ptr;
+            delevate(&vec);
+        }
+    |
+        rvalue tLT
+        {
+            push_ptr(push_value(&vec,getTempVarName()));
+            elevate(&vec);
+        }
+        rvalue {
+            int* ptr = pop_ptr();
+            fprintf(file,"CLT %p %p %p\n",ptr,$1,$4);
+            $$=ptr;
+            delevate(&vec);
+        }
+    |
+        rvalue tGT
+        {
+            push_ptr(push_value(&vec,getTempVarName()));
+            elevate(&vec);
+        }
+        rvalue {
+            int* ptr = pop_ptr();
+            fprintf(file,"CGT %p %p %p\n",ptr,$1,$4);
+            $$=ptr;
+            delevate(&vec);
+        }
+    |
+        rvalue tCEQ
+        {
+            push_ptr(push_value(&vec,getTempVarName()));
+            elevate(&vec);
+        }
+        rvalue {
+            int* ptr = pop_ptr();
+            fprintf(file,"CEQ %p %p %p\n",ptr,$1,$4);
+            $$=ptr;
+            delevate(&vec);
+        }
+    |
+        rvalue tNEQ
+        {
+            push_ptr(push_value(&vec,getTempVarName()));
+            elevate(&vec);
+        }
+        rvalue {
+            int* ptr = pop_ptr();
+            fprintf(file,"CNE %p %p %p\n",ptr,$1,$4);
             $$=ptr;
             delevate(&vec);
         }
