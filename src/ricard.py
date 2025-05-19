@@ -148,7 +148,15 @@ def exec_line():
         printed = True
         line_num += 1
     elif line[0] == "GSW":
-        reg_mem[line[1]] = input(f"Switch n# {reg_mem[line[2]]}?\n > ")
+        v = input(f"Switch n# {reg_mem[line[2]]}?\n > ")
+        if len(v) == 0:
+            v = 0
+        else:
+            if v[0]=='0':
+                v = 0
+            else:
+                v = 1
+        reg_mem[line[1]] = v
         line_num += 1
     else:
         print(f"Unknown: {line}")
@@ -175,6 +183,7 @@ def print_reg():
 print_code(line_num)
 while True:
     inpu = input("[D]ata, [R]eg, [L]ist, [T]oggle_whole_code, [C]ontinue, [E]xit: (default: C)" )
+    args=[]
     if len(inpu) == 0:
         command = "C"
     else:

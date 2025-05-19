@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+if [ $# != 2 ]
+then
+    echo "Usage: $0 <infile> <outfile>"
+    exit -1
+fi
+
+build/yacc.out < $1 $2.asm && python3 src/asm2machineCode.py $2.asm $2
