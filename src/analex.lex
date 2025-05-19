@@ -18,7 +18,8 @@
 %}
 %option noyywrap yylineno
 D   [0-9]
-INT {D}+("e"{D}+)?
+INT {D}+("e"{D}+)?|0[xX][0-9a-fA-F]+
+/* INT    ({D}+([eE]{D}+)?  |  0[xX][0-9A-Fa-f]+) */
 OPE [&|\^<>]|"=="|"<="|">="|"!="|"<<"|">>"
 TYPE "int"|"const"
 NAME [a-zA-Z_][a-zA-Z0-9_]*
@@ -29,6 +30,7 @@ NAME [a-zA-Z_][a-zA-Z0-9_]*
 "main"                      NAME_RET(tMAIN)
 {INT}                       VALUE_RET_NB(tNB)
 {OPE}                       VALUE_RET_ID(tOPE)
+"&"                         NAME_RET(tESP)
 "+"                         NAME_RET(tADD)
 "-"                         NAME_RET(tSUB)
 "*"                         NAME_RET(tMUL)
