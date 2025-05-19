@@ -47,7 +47,7 @@ vector newVector()
     vector v = {malloc(INIT_VEC_CAPA * sizeof(cell)), INIT_VEC_CAPA, 0, 0};
     return v;
 }
-int *push(vector *vec, char *ID)
+int *push_value(vector *vec, char *ID)
 {
 #ifdef DEBUG_VEC_SIZE
     fprintf(stderr, "vec(%i/%i) id %s (%i) pushed", vec->size + 1, vec->capacity, ID, vec->max_height);
@@ -61,7 +61,26 @@ int *push(vector *vec, char *ID)
 #ifdef DEBUG_VEC
     fprintf(stderr, "Pushing %s (%p) -> %p\n", ptr, ptr, sp);
 #endif // DEBUG_VEC
-    cell data = {ptr, vec->max_height, sp++, INT};
+    cell data = {ptr, vec->max_height, sp++, INT, 0}; //0 means pointer level is 0
+    vec->cells[vec->size++] = data;
+    return data.ptr;
+}
+
+int *push_pointer(vector *vec, char *ID, unsigned int level)
+{
+#ifdef DEBUG_VEC_SIZE
+    fprintf(stderr, "vec(%i/%i) id %s (%i) pushed", vec->size + 1, vec->capacity, ID, vec->max_height);
+#endif // DEBUG_VEC
+    assert(ID != NULL && strlen(ID) > 0 && "ID VIDE !");
+    if (vec->size == vec->capacity)
+        doubleVecSize(vec);
+
+    char *ptr = malloc(256);
+    strncpy(ptr, ID, 255);
+#ifdef DEBUG_VEC
+    fprintf(stderr, "Pushing %s (%p) -> %p\n", ptr, ptr, sp);
+#endif // DEBUG_VEC
+    cell data = {ptr, vec->max_height, sp++, INT, level};
     vec->cells[vec->size++] = data;
     return data.ptr;
 }
@@ -106,18 +125,6 @@ void delevate(vector *vec)
     fprintf(stderr, "}\n");
 #endif
 }
-
-// void setVectorSize(void** data, unsigned* currentSize, unsigned newSize,char copy)
-// {
-//     if(*currentSize>=newSize) return;
-//     unsigned newSize_ = *currentSize*2;
-//     while(newSize_<newSize) newSize_*=2;
-//     void* tmp = malloc(newSize_);
-//     if(copy) memcpy(tmp,*data,*currentSize);
-//     *currentSize=newSize_;
-//     free(*data);
-//     *data=tmp;
-// }
 
 cell *find(vector *v, char *id)
 {

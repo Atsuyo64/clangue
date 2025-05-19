@@ -12,6 +12,7 @@ typedef struct
     unsigned height;
     int *ptr;
     TYPE type;
+    int ptr_level;
 } cell;
 
 typedef struct
@@ -23,7 +24,7 @@ typedef struct
 } vector;
 
 vector newVector();
-int* push(vector *vec, char* ID);
+int* push_value(vector *vec, char* ID);
 void elevate(vector *vec);
 void delevate(vector *vec);
 cell *find(vector *v, char *id);
