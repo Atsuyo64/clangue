@@ -25,6 +25,7 @@ typedef struct
 
 vector newVector();
 int* push_value(vector *vec, char* ID);
+int *push_pointer(vector *vec, char *ID, unsigned int level);
 void elevate(vector *vec);
 void delevate(vector *vec);
 cell *find(vector *v, char *id);
@@ -32,3 +33,6 @@ TYPE str2type(char* str);
 
 void push_ptr(int* ptr);
 int* pop_ptr();
+
+cell *find_by_ptdr(vector *v, int *ptdr);
+int find_ptr_level(vector *v,int *ptr);

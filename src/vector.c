@@ -138,6 +138,23 @@ cell *find(vector *v, char *id)
     return NULL;
 }
 
+cell *find_by_ptdr(vector *v, int *ptdr)
+{
+    for (int i = v->size - 1; i >= 0; --i)
+    {
+        if (ptdr == v->cells[i].ptr)
+        {
+            return v->cells + i;
+        }
+    }
+    return NULL;
+}
+
+int find_ptr_level(vector *v,int *ptr) {
+  cell *c = find_by_ptdr(v, ptr);
+  return c ? c->ptr_level : 0;
+}
+
 TYPE str2type(char *str)
 {
     if (strncmp(str, "int", 3) == 0)
