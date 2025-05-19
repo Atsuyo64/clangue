@@ -6,12 +6,14 @@
 
 %token <nb> tNB
 %token <id> tID tTYPE tOPE
-%type <ptr> rvalue lvalue
+%type <ptr> rvalue lvalue //pointer
 
+%nonassoc USTAR       /* non‐associative, highest precedence */
 %nonassoc REDUCE 
 %nonassoc tELSE
 
 %right tEQ
+%left tESP
 %left tADD tSUB
 %left tMUL tDIV tOPE
 
@@ -45,20 +47,10 @@ int while_height = 0;
 
 program:
         tMAIN tOP tCP body
-        /* |
-        tMAIN tOP tCP body error { // FIXME: marche pas snif
-            yyerror("Missing '}' at end of main");
-            yyerrok;
-        } */
     ;
 
 body:
         tOB {elevate(&vec);} expressions tCB {delevate(&vec);}
-        /* |
-        tOB {elevate(&vec);} expressions tCB error { // FIXME: marche pas snif
-            yyerror("Missing '}' at end of body");
-            yyerrok;
-        } */
     ;
 
 expressions: 
@@ -71,8 +63,6 @@ expressions:
 
 expression:
         {elevate(&vec);} rvalue {delevate(&vec);}
-    /* |
-        tPRINTF tOP {elevate(&vec);} rvalue {fprintf(file,"PRT %p\n",$4); delevate(&vec);} tCP  */
     |
         tPRINTF tOP {elevate(&vec);} rvalue tCOMMA rvalue {fprintf(file,"PRT %p %p\n",$4,$6); delevate(&vec);} tCP 
     |
@@ -81,44 +71,71 @@ expression:
 
 declarations:
         tTYPE tID {
-            push(&vec,$2);
+            push_value(&vec,$2);
         }
     |
         tTYPE tID tCOMMA declaration {
-            push(&vec,$2);
+            push_value(&vec,$2);
         }
     |
         tTYPE tID 
         {
-            push_ptr(push(&vec,$2));
+            push_ptr(push_value(&vec,$2));
             elevate(&vec);
         } 
         tEQ rvalue
         {
-            fprintf(file,"COP %p %p\n",pop_ptr(),$5); //FIXME: AFC -> COP
+            fprintf(file,"COP %p %p\n",pop_ptr(),$5);
             delevate(&vec);
+        }
+    |
+        tTYPE tMUL tID                         
+        { 
+            /* allocate a pointer cell of ptr_level=1 */
+            push_pointer(&vec, $3, /* ptr_level= */1);
+        }
+    | 
+        tTYPE tMUL tID tEQ rvalue             
+        {
+            int *dst = push_pointer(&vec, $3, /* ptr_level= */1);
+            // fprintf(file, "AFC %p #%d\n", dst, $5);
+            fprintf(file, "COP %p %p\n", dst, $5);
         }
     ;
 
+/* pointer:
+      /* empty *      { $$ = 0; }
+    | tMUL pointer     { $$ = $2 + 1; /* nombur of ref (for instance **a has 2) * }
+    ; */
+
 declaration:
         tID {
-            push(&vec,$1);
+            push_value(&vec,$1);
         }
     |
         tID tCOMMA declaration {
-            push(&vec,$1);
+            push_value(&vec,$1);
         }
     |
         tID 
         {
-            push_ptr(push(&vec,$1));
+            push_ptr(push_value(&vec,$1));
             elevate(&vec);
         } 
         tEQ rvalue
         {
-            fprintf(file,"COP %p %p\n",pop_ptr(),$4); //FIXME: AFC -> COP
+            fprintf(file,"COP %p %p\n",pop_ptr(),$4);
             delevate(&vec);
         }
+    | tMUL tID                         
+      { push_pointer(&vec, $2, /* ptr_level= */1); }
+    | tMUL tID tEQ rvalue             
+      {
+        int *dst = push_pointer(&vec, $2, /* ptr_level= */1);
+        // fprintf(file, "AFC %p #%d\n", dst, $4);
+        fprintf(file, "COP %p %p\n", dst, $4);
+      }
+    ;
     ;
 
 whilif:
@@ -188,7 +205,20 @@ statement:
 
 // TODO: *(ptr + 1)
 // TODO: 13[ptr]
-lvalue: //ok
+lvalue:
+    tMUL rvalue %prec USTAR {
+        int *p = $2;
+        /* generate a temporary to hold the loaded value */
+        int *temp = push_pointer(&vec,
+                                getTempVarName(),
+                                /* ptr_level = original ptr_level–1 */
+                                find_ptr_level(&vec, p) - 1
+                               );
+        // fprintf(file, "AFC %p #%d\n", temp, p);
+        fprintf(file, "COP %p %p\n", temp, p);
+        $$ = temp;
+    }
+    |
     tID {
         cell* data;
         if(data = find(&vec,$1)) {
@@ -208,8 +238,15 @@ lvalue: //ok
     ;
 
 rvalue:
+        
+        tESP lvalue { 
+            /* TODO: FIXME: $2 is an address of the variable; but we want the address‐of operator: */
+            /* For a local variable, address = its ptr field (already an address) */
+            $$ = $2; 
+        }
+    |
         tNB {
-            int* ptr = push(&vec,getTempVarName());
+            int* ptr = push_value(&vec,getTempVarName());
             fprintf(file,"AFC %p #%i\n",ptr,$1);
             $$=ptr;
         }
@@ -219,16 +256,16 @@ rvalue:
         } 
     |
         tSUB rvalue {
-            int* ptr = push(&vec,getTempVarName());
+            int* ptr = push_value(&vec,getTempVarName());
             fprintf(file,"AFC %p #0\n",ptr);
             fprintf(file,"SUB %p %p %p\n",ptr,ptr,$2);
             $$=ptr;
         }
     |
-        lvalue
+        lvalue %prec USTAR
     |
         tREADSW tOP {
-                push_ptr(push(&vec,getTempVarName()));
+                push_ptr(push_value(&vec,getTempVarName()));
                 elevate(&vec);
             } rvalue tCP {
                 int* ptr = pop_ptr();
@@ -239,7 +276,7 @@ rvalue:
     |
         rvalue tADD
         {
-            push_ptr(push(&vec,getTempVarName()));
+            push_ptr(push_value(&vec,getTempVarName()));
             elevate(&vec);
         }
         rvalue {
@@ -251,7 +288,7 @@ rvalue:
     |
         rvalue tSUB
         {
-            push_ptr(push(&vec,getTempVarName()));
+            push_ptr(push_value(&vec,getTempVarName()));
             elevate(&vec);
         }
         rvalue {
@@ -263,7 +300,7 @@ rvalue:
     |
         rvalue tMUL
         {
-            push_ptr(push(&vec,getTempVarName()));
+            push_ptr(push_value(&vec,getTempVarName()));
             elevate(&vec);
         }
         rvalue {
@@ -275,7 +312,7 @@ rvalue:
     |
         rvalue tDIV
         {
-            push_ptr(push(&vec,getTempVarName()));
+            push_ptr(push_value(&vec,getTempVarName()));
             elevate(&vec);
         }
         rvalue {
