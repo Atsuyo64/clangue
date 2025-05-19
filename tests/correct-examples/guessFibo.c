@@ -20,10 +20,10 @@ main()
 
         if(guess-a){
             //loose
-            printf(2,255);
+            printf(2,0xff);
         } else {
             //win
-            printf(2,102);
+            printf(2,0x66);
         }
         printf(1, a);
     }
