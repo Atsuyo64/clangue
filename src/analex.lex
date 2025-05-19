@@ -28,9 +28,9 @@ NAME [a-zA-Z_][a-zA-Z0-9_]*
 "//"[^\n]*                  { }
 "/*"(.|\n|\t)*"*/"          { }
 "main"                      NAME_RET(tMAIN)
+"&"                         NAME_RET(tESP)
 {INT}                       VALUE_RET_NB(tNB)
 {OPE}                       VALUE_RET_ID(tOPE)
-"&"                         NAME_RET(tESP)
 "+"                         NAME_RET(tADD)
 "-"                         NAME_RET(tSUB)
 "*"                         NAME_RET(tMUL)
