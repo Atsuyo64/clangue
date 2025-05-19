@@ -20,6 +20,12 @@ instructions = {
     "LDR":11, #LDR @reg @mem
     "PRT":12,
     "GSW":13,
+    "CLE":14,
+    "CGE":15,
+    "CLT":16,
+    "CGT":17,
+    "CEQ":18,
+    "CNE":19,
 }
 
 def op2ins(op):
@@ -48,6 +54,18 @@ def print_line(line):
         print(f"r{line[1]} := r{line[2]} * r{line[3]}")
     elif line[0] == "DIV":
         print(f"r{line[1]} := r{line[2]} / r{line[3]}")
+    elif line[0] == "CLE":
+        print(f"r{line[1]} := r{line[2]} <= r{line[3]}")
+    elif line[0] == "CGE":
+        print(f"r{line[1]} := r{line[2]} >= r{line[3]}")
+    elif line[0] == "CLT":
+        print(f"r{line[1]} := r{line[2]} < r{line[3]}")
+    elif line[0] == "CGT":
+        print(f"r{line[1]} := r{line[2]} > r{line[3]}")
+    elif line[0] == "CEQ":
+        print(f"r{line[1]} := r{line[2]} == r{line[3]}")
+    elif line[0] == "CNE":
+        print(f"r{line[1]} := r{line[2]} != r{line[3]}")
     elif line[0] == "LDR":
         print(f"r{line[1]} <- @{line[2]}")
     elif line[0] == "STR":
@@ -121,6 +139,24 @@ def exec_line():
         line_num += 1
     elif line[0] == "DIV":
         reg_mem[line[1]] = (reg_mem[line[2]] // reg_mem[line[3]])%256
+        line_num += 1
+    elif line[0] == "CLE":
+        reg_mem[line[1]] = (reg_mem[line[2]] <= reg_mem[line[3]])%256
+        line_num += 1
+    elif line[0] == "CGE":
+        reg_mem[line[1]] = (reg_mem[line[2]] >= reg_mem[line[3]])%256
+        line_num += 1
+    elif line[0] == "CLT":
+        reg_mem[line[1]] = (reg_mem[line[2]] < reg_mem[line[3]])%256
+        line_num += 1
+    elif line[0] == "CGT":
+        reg_mem[line[1]] = (reg_mem[line[2]] > reg_mem[line[3]])%256
+        line_num += 1
+    elif line[0] == "CEQ":
+        reg_mem[line[1]] = (reg_mem[line[2]] == reg_mem[line[3]])%256
+        line_num += 1
+    elif line[0] == "CNE":
+        reg_mem[line[1]] = (reg_mem[line[2]] != reg_mem[line[3]])%256
         line_num += 1
     elif line[0] == "LDR":
         reg_mem[line[1]] = data_mem[line[2]]

@@ -15,6 +15,12 @@ instructions = {
     "LDR":11, #LDR @reg @mem
     "PRT":12,
     "GSW":13,
+    "CLE":14,
+    "CGE":15,
+    "CLT":16,
+    "CGT":17,
+    "CEQ":18,
+    "CNE":19,
     # "LRF":14, #Load Reference : LRF @dest *@src
 }
 
@@ -103,7 +109,7 @@ for line in src.readlines():
             print("Unknown instruction: "+args[0])
             break
         opcode = instructions[args[0]]
-        if args[0] == "ADD" or args[0] == "SUB" or args[0] == "MUL" or args[0] == "DIV":
+        if args[0] == "ADD" or args[0] == "SUB" or args[0] == "MUL" or args[0] == "DIV" or args[0] == "CLE" or args[0] == "CGE" or args[0] == "CLT" or args[0] == "CGT" or args[0] == "CEQ" or args[0] == "CNE":
             if len(args) != 4:
                 print("Error at line "+line+": incorrect num of args")
                 break

@@ -344,7 +344,7 @@ rvalue:
         }
         rvalue {
             int* ptr = pop_ptr();
-            fprintf(file,"LGE %p %p %p\n",ptr,$1,$4);
+            fprintf(file,"CGE %p %p %p\n",ptr,$1,$4);
             $$=ptr;
             delevate(&vec);
         }
