@@ -78,7 +78,7 @@ int *push_pointer(vector *vec, char *ID, unsigned int level)
     char *ptr = malloc(256);
     strncpy(ptr, ID, 255);
 #ifdef DEBUG_VEC
-    fprintf(stderr, "Pushing %s (%p) -> %p\n", ptr, ptr, sp);
+    fprintf(stderr, "Pushing_ptr %s* (%p) -> %p (lvl:%d)\n", ptr, ptr, sp, level);
 #endif // DEBUG_VEC
     cell data = {ptr, vec->max_height, sp++, INT, level};
     vec->cells[vec->size++] = data;
