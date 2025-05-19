@@ -18,6 +18,8 @@ instructions = {
     "NOZ":9,
     "STR":10,
     "LDR":11, #LDR @reg @mem
+    "PRT":12,
+    "GSW":13,
 }
 
 def op2ins(op):
@@ -60,6 +62,10 @@ def print_line(line):
         print(f"if (flag == false) goto {line[1]}")
     elif line[0] == "NOP":
         print(f"NOP")
+    elif line[0] == "PRT":
+        print(f"print(r{line[3]},r{line[2]})")
+    elif line[0] == "GSW":
+        print(f"r{line[1]} <- switch[r{line[2]}]")
     else:
         print(f"Unknown: {line}")
 
@@ -92,6 +98,7 @@ data_mem = [0 for _ in range(256)]
 flag = False
 line_num = 0
 print_whole_code = True
+printed = False
 
 def exec_line():
     global line_num
@@ -99,6 +106,7 @@ def exec_line():
     global reg_mem
     global data_mem
     global lines
+    global printed
     if line_num >= len(lines):
         return
     line = lines[line_num]
@@ -135,6 +143,13 @@ def exec_line():
             line_num += 1
     elif line[0] == "NOP":
         line_num += 1
+    elif line[0] == "PRT":
+        print(f"PRINT {reg_mem[line[3]]} {line[2]:02x}")
+        printed = True
+        line_num += 1
+    elif line[0] == "GSW":
+        reg_mem[line[1]] = input(f"Switch n# {reg_mem[line[2]]}?\n > ")
+        line_num += 1
     else:
         print(f"Unknown: {line}")
         line_num += 1
@@ -159,13 +174,18 @@ def print_reg():
 
 print_code(line_num)
 while True:
-    command = input("[D]ata, [R]eg, [L]ist, [T]oggle_whole_code, [C]ontinue, [E]xit: (default: C)" )
-    if len(command) == 0:
+    inpu = input("[D]ata, [R]eg, [L]ist, [T]oggle_whole_code, [C]ontinue, [E]xit: (default: C)" )
+    if len(inpu) == 0:
         command = "C"
     else:
-        command = command[0].capitalize()
+        command = inpu[0].capitalize()
+        args=inpu.split()[1:]
     if command == "C":
-        exec_line()
+        if len(args) != 0:
+            for i in range(int(args[0])):
+                exec_line()
+        else:
+            exec_line()
         if print_whole_code:
             print_code(line_num)
         else:
@@ -183,3 +203,11 @@ while True:
             print_code(line_num)
     elif command == "T":
         print_whole_code = not print_whole_code
+    elif command == "P":
+        while not printed:
+            exec_line()
+        printed=False
+        if print_whole_code:
+            print_code(line_num)
+        else:
+            print_few_lines(line_num)
