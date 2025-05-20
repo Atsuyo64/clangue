@@ -8,6 +8,7 @@
 %token <id> tID tTYPE tOPE
 %type <ptr> rvalue lvalue //pointer
 
+%nonassoc UESTAR       /* non‐associative, highest precedence */
 %nonassoc USTAR       /* non‐associative, highest precedence */
 %nonassoc REDUCE 
 %nonassoc tELSE
@@ -248,6 +249,12 @@ rvalue:
             /* TODO: FIXME: $2 is an address of the variable; but we want the address‐of operator: */
             /* For a local variable, address = its ptr field (already an address) */
             $$ = $2; 
+        }
+    |
+        tMUL lvalue %prec UESTAR tEQ {elevate(&vec);} rvalue {
+            delevate(&vec);
+            fprintf(file,"SRF %p %p\n",$2,$5);
+            $$=$2;
         }
     |
         tNB {
