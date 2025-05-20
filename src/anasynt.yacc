@@ -7,17 +7,17 @@
 %token <nb> tNB
 %token <id> tID tTYPE tOPE
 %type <ptr> rvalue lvalue //pointer
-
-%nonassoc UESTAR       /* non‐associative, highest precedence */
-%nonassoc USTAR       /* non‐associative, highest precedence */
+       /* non‐associative, highest precedence */
+%nonassoc UESTAR
+%nonassoc USTAR 
 %nonassoc REDUCE 
 %nonassoc tELSE
 
-%right tEQ
 %left tESP
 %left tADD tSUB
 %left tMUL tDIV tOPE
 %left tLE tGE tLT tGT tCEQ tNEQ
+%right tEQ
 
 %{
 #include "stdio.h"
@@ -251,11 +251,11 @@ rvalue:
             $$ = $2; 
         }
     |
-        tMUL lvalue %prec UESTAR tEQ {elevate(&vec);} rvalue {
+        tMUL rvalue tEQ {elevate(&vec);} rvalue {
             delevate(&vec);
             fprintf(file,"SRF %p %p\n",$2,$5);
             $$=$2;
-        }
+        } %prec UESTAR
     |
         tNB {
             int* ptr = push_value(&vec,getTempVarName());
