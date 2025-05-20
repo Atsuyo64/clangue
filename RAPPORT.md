@@ -17,8 +17,8 @@ La seconde étape du compilateur traduit et adapte l'assembleur pour le processe
 
 ### Raisingue
 
-Le processeur *raisingue* a été conçu pour exécuter les instructions de l'assembleur dans un pipeline à quatre étapes : Décodage, Exécution (ALU), Mémoire et Writeback (écriture vers les registres).\
-Vivado a été utilisé pour sa conception, et nous avons essayé de séparer au maximum les différents composants (une vingtaine de fichiers sources)? Un composant *Main* relie l'ensemble des composants.
+Le processeur *raisingue* a été conçu pour exécuter les instructions de l'assembleur dans un pipeline à quatre étapes : Décodage, Exécution (ALU), Mémoire et Write-back (écriture vers les registres).\
+Vivado a été utilisé pour sa conception, et nous avons essayé de séparer au maximum les différents composants (une vingtaine de fichiers sources) ? Un composant *Main* relie l'ensemble des composants.
 
 ## 3. Choix d'implémentation
 
@@ -27,10 +27,10 @@ Vivado a été utilisé pour sa conception, et nous avons essayé de séparer au
 #### 3.1.1 Lex + Yacc
 
 Notre implémentation se démarque par ces différents aspects :
-- Lex permet d'indiquer à Yacc la ligne en train d'être traîtée. Cette information est utilisable en cas d'erreur de syntaxe.
+- Lex permet d'indiquer à Yacc la ligne en train d'être traitée. Cette information est utilisable en cas d'erreur de syntaxe.
 - Aucun conflit (ni shift/reduce, ni reduce/reduce)
 - L'assembleur généré contient des déclarations de label, et les instructions de branchement (JMP et JMF) les utilisent. Cela rend l'assembleur beaucoup plus facile à lire. De plus, les numéros d'instruction vont changer lors de la phase suivante (voir l'explication dans la partie suivante).
-- Gestion des entrées/sortie grâce aux fonction *printf* et *read_switch* qui respectivement "écrit" sur les LEDs et le display 7-segments et lit l'état des switchs de la FPGA.
+- Gestion des entrées/sortie grâce aux fonctions *printf* et *read_switch* qui respectivement "écrit" sur les LEDs et le display 7-segments et lit l'état des switchs de la FPGA.
 - Gestion des pointeurs
 
 #### 3.1.2 Jeu d'instruction (*Binaire Avancé Raisingue : BAR*)
@@ -40,18 +40,18 @@ En plus des instructions classiques (NOP, ADD, SUB, MUL, DIV, JMP, LDR, STR, AFC
 - Instruction `JMF address` : Saute à l'adresse _address_ uniquement si le flag _NOZ_ == false.
 - Instructions `CEQ R1 R2 R3` (resp. `CNE`, `CLE`, `CGE`, `CLT` et `CGT`) : *R1* := (*R2* == *R3*) (resp. !=, <=, >=, < et >)
 - Instruction `PRT R1 R2` : "écrit" la valeur de R2 soit sur les LEDs si R1 == 0, sur le côté droit du display 7-segment si R1 == 1, et sur le côté gauche si R1 == 2
-- Instruction `GSW R1 R2` : (Get SWitch) lit la valeur du switch numero *R2* dans *R1*
+- Instruction `GSW R1 R2` : (Get SWitch) lit la valeur du switch numéro *R2* dans *R1*
 - Instruction `SRF R1 R2` : (Store ReFerence) opération sur pointeur : *\*R1 := R2*
 - Instruction `LRF R1 R2` : (Load ReFerence) opération sur pointeur : *R1 := \*R2*
 - La transformation de l'assembleur orienté mémoire en assembleur orienté registre nécessite d'ajouter de nombreux `LDR` et `STR` afin de copier les données dans les registres pour être utilisées puis les sauvegarder.
 
-Note : pour l'assembleur post-Yacc, tous les registres en arguments sont en réalité des adresses mémoire (assembleur orienté mémoire), et les addresses sont en réalité des labels.
+Note : pour l'assembleur post-Yacc, tous les registres en arguments sont en réalité des adresses mémoire (assembleur orienté mémoire), et les adresses sont en réalité des labels.
 
 #### 3.1.3 Assembleur vers code machine
 
 Trois opérations sont réalisées durant cette étape :
 - Ajout des `LDR` `STR` nécessaires pour l'assembleur orienté registre
-- Détermination le numéro d'instruction associé à chaque label. Cette étape nécessite 2 passages : un premier pour définir les addresses des labels et un deuxième pour remplacer les labels par leur valeur (nécessaire car certains labels sont utilisés (`JMP`) avant d'être définis)
+- Détermination le numéro d'instruction associé à chaque label. Cette étape nécessite 2 passages : un premier pour définir les adresses des labels et un deuxième pour remplacer les labels par leur valeur (nécessaire, car certains labels sont utilisés (`JMP`) avant d'être définis)
 - Génération du code machine en VHDL pouvant être copié-collé dans la mémoire d'instructions.
 
 ### 3.2 Processeur (*raisingue*)
@@ -67,18 +67,16 @@ Le processeur utilise le pipeline proposé dans le sujet. Notre version possède
 #### 3.2.2 Architecture
 
 Comme le montre la figure suivante, notre processeur ajoute les unités suivantes : Unité de branchement, 
-# TODO: unités
+![Schéma de l'architecture](doc/archi.jpg)
 
 #### 3.2.3 Aléas
 
-Les risques d'aléas sont causé par le fait que plusieurs operations interdépendantes peuvent être en même temps dans dans le pipeline. Dans notre processeur, les aléas ont été éliminés grâce au _Decoder_ qui indique à _PC_ de rajouter des instructions `NOP` en cas de risque d'aléas. Nous avons amélioré la rapidité d'exécution de 29.5% (3.1ms contre 4.4ms sur un programme test) en ne rajoutant des `NOP` qu'après des instructions nécessitant un write-back.
+Les risques d'aléas sont causés par le fait que plusieurs operations interdépendantes peuvent être en même temps dans le pipeline. Dans notre processeur, les aléas ont été éliminés grâce au _Decoder_ qui indique à _PC_ de rajouter des instructions `NOP` en cas de risque d'aléas. Nous avons amélioré la rapidité d'exécution de 29.5% (3.1 ms contre 4.4 ms sur un programme test) en ne rajoutant des `NOP` qu'après des instructions nécessitant un write-back.
 
 ### 4. Problèmes rencontrés par ordre d'importance et solutions
 
 
-#### YACC (dangling else, unary operations, conflis ...)
-
-<!-- Beaucoup de temps perdu et l'utilisation de %no-assoc/%prec au pif ont permis de regler (tous) les problèmes. Ça fonctionne, donc pas touche. -->
+#### YACC (dangling else, unary operations, conflits ...)
 
 Utilisation de %left et %prec.
 
@@ -88,17 +86,17 @@ Création de l'instruction et du flag NOZ.
 
 #### Problème de timing avec le register file et la mémoire
 
-Le délais de propagation des signaux introduisait un délais de un cycle de clock. Le problème a été reglé décalant les clocks en question d'une demi periode (front descendant).
+Le délai de propagation des signaux introduisait un délai d'un cycle de clock. Le problème a été réglé décalant les clocks en question d'une demi période (front descendant).
 
-#### Regex pour commentaire multi ligne
+#### Regex pour commentaire multiligne
 
 Une décomposition en machine à état pour simplifier la réflexion.
 
-#### Traduction d'un ASM orienté memoire vers ASM orienté registre
+#### Traduction d'un ASM orienté mémoire vers ASM orienté registre
 
-Ajout <!--massif -->d'instructions `LDR` et `STR` pour passez de l'un à l'autre.
+Ajout d'instructions `LDR` et `STR` pour passer de l'un à l'autre.
 
-#### Gestion des aléa
+#### Gestion des aléas
 
 Ajout de NOP entre les instructions au niveau du processeur.
 
@@ -108,7 +106,7 @@ Ajout de NOP entre les instructions au niveau du processeur.
 
 Le compilateur *clangue* génère correctement un assembleur simplifié qui est ensuite transformé en code machine par le cross-compilateur Python. Le processeur *raisingue* exécute correctement les instructions, gère les sauts et évite les conflits de données.
 
-Le débogueur *R.I.C.A.R.D.* permet de tester le code machine générés par les compilateurs. Il permet aussi de le débugger en permettant de suivre l’état des registres et de la mémoire pendant l’exécution du code.
+Le débogueur *R.I.C.A.R.D.* permet de tester le code machine généré par les compilateurs. Il permet aussi de le debugger en permettant de suivre l’état des registres et de la mémoire pendant l’exécution du code.
 
 ### 6. Justification des instructions ajoutées
 
