@@ -201,10 +201,11 @@ def exec_line():
         reg_mem[line[1]] = v
         line_num += 1
     elif line[0] == "SRF":
-        data_mem[reg_mem[line[2]]] = reg_mem[line[3]]
+        print(f"exec srf : {line}")
+        data_mem[reg_mem[line[2]]//4] = reg_mem[line[3]]
         line_num += 1
     elif line[0] == "LRF":
-        reg_mem[line[1]] = data_mem[reg_mem[line[2]]]
+        reg_mem[line[1]] = data_mem[reg_mem[line[2]]//4]
         line_num += 1
     else:
         print(f"Unknown: {line}")
