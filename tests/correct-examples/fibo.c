@@ -1,5 +1,5 @@
 main()
-{
+{    
     int stdout = 1;
     int stdout2 = 2;
     int a1, a2, b1, b2, c1, c2;
@@ -48,6 +48,32 @@ main()
         printf(stdout, a1);
     }
 }
+
+//FIXME: comments does not work inside of main ?
+
+    /* int a;
+    int* ptra = &a;
+    int ** ptrptra = &ptra[1];
+    int* tab;
+    int index = read_switch(0);
+    int res = *(tab+index);
+    */
+    // ADD TMP TAB INDEX
+    // LRF TMP TMP
+    // COP RES TMP
+
+    //int a = *(*ptrptra);
+    // int tID = · lvalue; lvalue: · * lvalue
+    // * => lvalue: * · lvalue; lvalue: · * lvalue
+    // * => lvalue: * · lvalue; lvalue: · tID
+    //ptrptra => lvalue: tId ·
+    //reduce tID => lvalue: 
+    // int 
+    // LRF @TMP1 @ptrptra
+    // COP 
+    // LRF @TMP1 @TMP1
+    // COP @a @TMP1
+
 
 // int b1;
 // int b2;
