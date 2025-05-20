@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-flex analex.lex
-gcc -D DEBUG_LEX lex.yy.c lex_launcher.c -o lex.out
-
 for e in `ls tests/incorrect-examples`
 do
     tput setaf 111
@@ -10,7 +7,7 @@ do
     echo ''
     tput setaf 230
     echo Result:
-	./lex.out < tests/incorrect-examples/$e
+	build/lex.out < tests/incorrect-examples/$e
     tput sgr0
     echo ''
 done
@@ -23,7 +20,7 @@ do
     echo ''
     tput setaf 230
     echo Result:
-	./lex.out < tests/correct-examples/$e
+	build/lex.out < tests/correct-examples/$e
     tput sgr0
     echo ''
 done
