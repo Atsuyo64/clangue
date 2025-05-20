@@ -12,12 +12,13 @@
 %nonassoc USTAR 
 %nonassoc REDUCE 
 %nonassoc tELSE
+%nonassoc tEQ
 
 %left tESP
 %left tADD tSUB
 %left tMUL tDIV tOPE
 %left tLE tGE tLT tGT tCEQ tNEQ
-%right tEQ
+/* %right tEQ */
 
 %{
 #include "stdio.h"
@@ -218,9 +219,6 @@ lvalue:
                                 /* ptr_level = original ptr_level–1 */
                                 find_ptr_level(&vec, p) - 1
                                );
-        // fprintf(file, "AFC %p #%d\n", temp, p);
-        // fprintf(file, "COP %p %p\n", temp, p);
-        // fprintf(file, "LDR %p %p\n", temp, p);
         fprintf(file, "LRF %p %p\n", temp, p);
         $$ = temp;
     }
@@ -244,18 +242,18 @@ lvalue:
     ;
 
 rvalue:
-        
-        tESP lvalue { 
-            /* TODO: FIXME: $2 is an address of the variable; but we want the address‐of operator: */
-            /* For a local variable, address = its ptr field (already an address) */
-            $$ = $2; 
-        }
-    |
+       
         tMUL rvalue tEQ {elevate(&vec);} rvalue {
             delevate(&vec);
             fprintf(file,"SRF %p %p\n",$2,$5);
             $$=$2;
         } %prec UESTAR
+    | 
+        tESP lvalue { 
+            /* TODO: FIXME: $2 is an address of the variable; but we want the address‐of operator: */
+            /* For a local variable, address = its ptr field (already an address) */
+            $$ = $2; 
+        }
     |
         tNB {
             int* ptr = push_value(&vec,getTempVarName());
