@@ -249,7 +249,14 @@ unary:
                     { 
             /* TODO: FIXME: $2 is an address of the variable; but we want the address‐of operator: */
             /* For a local variable, address = its ptr field (already an address) */
-            $$ = $2; 
+            int *p = $2;
+            int *temp = push_pointer(&vec,
+                                getTempVarName(),
+                                /* ptr_level = original ptr_level–1 */
+                                find_ptr_level(&vec, p) + 1
+                            );
+        fprintf(file, "AFC %p #%d\n", temp, p);
+            $$ = temp; 
         }
     | tADD unary     %prec UPLUS
                     {
