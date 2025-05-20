@@ -6,4 +6,4 @@ then
     exit -1
 fi
 
-build/yacc.out < $1 $2.asm && python3 src/asm2machineCode.py $2.asm $2
+build/yacc.out < $1 programs/$2.asm && python3 src/asm2machineCode.py programs/$2.asm programs/$2
