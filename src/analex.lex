@@ -7,8 +7,6 @@
 #define VALUE_RET_NB(x) {printf(" " #x "[%s]",yytext);}
 #else //not DEBUG_LEX
 #include "y.tab.h"
-//TODO: manually parse exponent notation !
-//FIXME: i+1 does not work (+1 is a number)
 #define printf(...) {}
 #define NAME_RET(x)  {printf(" " #x); return x;}
 #define VALUE_RET_ID(x) {printf(" " #x "[%s]",yytext); yylval.id=strdup(yytext); return x;}
@@ -18,9 +16,8 @@
 %}
 %option noyywrap yylineno
 D   [0-9]
-INT {D}+("e"{D}+)?|0[xX][0-9a-fA-F]+
-/* INT    ({D}+([eE]{D}+)?  |  0[xX][0-9A-Fa-f]+) */
-OPE [&|\^<>]|"=="|"<="|">="|"!="|"<<"|">>"
+INT {D}+([eE]{D}+)?|0[xX][0-9a-fA-F]+
+OPE [|\^]|"<<"|">>"
 TYPE "int"|"const"
 NAME [a-zA-Z_][a-zA-Z0-9_]*
 
