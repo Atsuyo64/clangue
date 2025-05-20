@@ -6,19 +6,22 @@
 
 %token <nb> tNB
 %token <id> tID tTYPE tOPE
-%type <ptr> rvalue lvalue //pointer
+%type <ptr> rvalue lvalue rel_expr add_expr mul_expr unary primary //pointer
        /* non‐associative, highest precedence */
-/* %nonassoc tEQ */
-%nonassoc USTAR 
+
+
+%nonassoc USTAR UADDR UPLUS USUB
+/* %nonassoc USTAR  */
 %nonassoc REDUCE 
 %nonassoc tELSE
 
-/* %left tEQ */
 
 %left tESP
 %left tADD tSUB
 %left tMUL tDIV tOPE
 %left tLE tGE tLT tGT tCEQ tNEQ
+/* %left tLT tGT tLE tGE
+%left tCEQ tNEQ */
 %right tEQ
 
 %{
@@ -209,10 +212,29 @@ statement:
         whilif
     ;
 
-// TODO: *(ptr + 1)
-// TODO: 13[ptr]
-lvalue:
-    tMUL rvalue %prec USTAR {
+
+primary:
+      tNB                {
+            int* ptr = push_value(&vec,getTempVarName());
+            fprintf(file,"AFC %p #%i\n",ptr,$1);
+            $$=ptr;
+        }
+    | lvalue             { /* identifier or array */ }
+    | tOP rvalue tCP     { $$ = $2;                }
+    | tREADSW tOP {
+                push_ptr(push_value(&vec,getTempVarName()));
+                elevate(&vec);
+            } rvalue tCP {
+                int* ptr = pop_ptr();
+                fprintf(file,"GSW %p %p\n",$4, ptr);
+                $$=ptr;
+                delevate(&vec);
+            }
+    ;
+
+unary:
+      tMUL unary   %prec USTAR
+                    {
         int *p = $2;
         /* generate a temporary to hold the loaded value */
         int *temp = push_pointer(&vec,
@@ -223,7 +245,165 @@ lvalue:
         fprintf(file, "LRF %p %p\n", temp, p);
         $$ = temp;
     }
-    |
+    | tESP lvalue    %prec UADDR
+                    { 
+            /* TODO: FIXME: $2 is an address of the variable; but we want the address‐of operator: */
+            /* For a local variable, address = its ptr field (already an address) */
+            $$ = $2; 
+        }
+    | tADD unary     %prec UPLUS
+                    {
+            $$=$2;
+        } 
+    | tSUB unary     %prec USUB
+                    {
+            int* ptr = push_value(&vec,getTempVarName());
+            fprintf(file,"AFC %p #0\n",ptr);
+            fprintf(file,"SUB %p %p %p\n",ptr,ptr,$2);
+            $$=ptr;
+        }
+    | primary
+    ;
+
+mul_expr:
+      mul_expr tMUL
+        {
+            push_ptr(push_value(&vec,getTempVarName()));
+            elevate(&vec);
+        }
+        mul_expr {
+            int* ptr = pop_ptr();
+            fprintf(file,"MUL %p %p %p\n",ptr,$1,$4);
+            $$=ptr;
+            delevate(&vec);
+        }
+    | mul_expr tDIV
+        {
+            push_ptr(push_value(&vec,getTempVarName()));
+            elevate(&vec);
+        }
+        unary {
+            int* ptr = pop_ptr();
+            fprintf(file,"DIV %p %p %p\n",ptr,$1,$4);
+            $$=ptr;
+            delevate(&vec);
+        }
+    | unary
+    ;
+
+add_expr:
+      add_expr tADD
+        {
+            push_ptr(push_value(&vec,getTempVarName()));
+            elevate(&vec);
+        }
+        mul_expr {
+            int* ptr = pop_ptr();
+            fprintf(file,"ADD %p %p %p\n",ptr,$1,$4);
+            $$=ptr;
+            delevate(&vec);
+        }
+    | add_expr tSUB
+        {
+            push_ptr(push_value(&vec,getTempVarName()));
+            elevate(&vec);
+        }
+        mul_expr {
+            int* ptr = pop_ptr();
+            fprintf(file,"SUB %p %p %p\n",ptr,$1,$4);
+            $$=ptr;
+            delevate(&vec);
+        }
+    | mul_expr
+    ;
+
+rel_expr:
+    rel_expr tLE
+        {
+            push_ptr(push_value(&vec,getTempVarName()));
+            elevate(&vec);
+        }
+        add_expr {
+            int* ptr = pop_ptr();
+            fprintf(file,"CLE %p %p %p\n",ptr,$1,$4);
+            $$=ptr;
+            delevate(&vec);
+        }
+    | rel_expr tGE
+        {
+            push_ptr(push_value(&vec,getTempVarName()));
+            elevate(&vec);
+        }
+        add_expr {
+            int* ptr = pop_ptr();
+            fprintf(file,"CGE %p %p %p\n",ptr,$1,$4);
+            $$=ptr;
+            delevate(&vec);
+        }
+    |  rel_expr tLT
+        {
+            push_ptr(push_value(&vec,getTempVarName()));
+            elevate(&vec);
+        }
+        add_expr {
+            int* ptr = pop_ptr();
+            fprintf(file,"CLT %p %p %p\n",ptr,$1,$4);
+            $$=ptr;
+            delevate(&vec);
+        }
+    | rel_expr tGT
+        {
+            push_ptr(push_value(&vec,getTempVarName()));
+            elevate(&vec);
+        }
+        add_expr {
+            int* ptr = pop_ptr();
+            fprintf(file,"CGT %p %p %p\n",ptr,$1,$4);
+            $$=ptr;
+            delevate(&vec);
+        }
+    | rel_expr tCEQ
+        {
+            push_ptr(push_value(&vec,getTempVarName()));
+            elevate(&vec);
+        }
+        add_expr {
+            int* ptr = pop_ptr();
+            fprintf(file,"CEQ %p %p %p\n",ptr,$1,$4);
+            $$=ptr;
+            delevate(&vec);
+        }
+    | rel_expr tNEQ
+        {
+            push_ptr(push_value(&vec,getTempVarName()));
+            elevate(&vec);
+        }
+        add_expr {
+            int* ptr = pop_ptr();
+            fprintf(file,"CNE %p %p %p\n",ptr,$1,$4);
+            $$=ptr;
+            delevate(&vec);
+        }
+    | add_expr
+    ;
+
+rvalue:
+      rel_expr
+    | lvalue tEQ {elevate(&vec);} rvalue {
+            delevate(&vec);
+            fprintf(file,"COP %p %p\n",$1,$4);
+            $$=$1;
+        }
+
+    | tMUL lvalue %prec tEQ tEQ {elevate(&vec);} rvalue {
+            delevate(&vec);
+            fprintf(file,"SRF %p %p\n",$2,$5);
+            $$=$2;
+        }
+    ;
+// TODO: *(ptr + 1)
+// TODO: 13[ptr]
+lvalue:
     tID {
         cell* data;
         if(data = find(&vec,$1)) {
@@ -241,183 +421,6 @@ lvalue:
         exit(1);
     }
     ;
-
-rvalue:
-        tMUL rvalue %prec tEQ tEQ {elevate(&vec);} rvalue {
-            delevate(&vec);
-            fprintf(file,"SRF %p %p\n",$2,$5);
-            $$=$2;
-        }
-    | 
-        tESP lvalue { 
-            /* TODO: FIXME: $2 is an address of the variable; but we want the address‐of operator: */
-            /* For a local variable, address = its ptr field (already an address) */
-            $$ = $2; 
-        }
-    |
-        tNB {
-            int* ptr = push_value(&vec,getTempVarName());
-            fprintf(file,"AFC %p #%i\n",ptr,$1);
-            $$=ptr;
-        }
-    |
-        tADD rvalue {
-            $$=$2;
-        } 
-    |
-        tSUB rvalue {
-            int* ptr = push_value(&vec,getTempVarName());
-            fprintf(file,"AFC %p #0\n",ptr);
-            fprintf(file,"SUB %p %p %p\n",ptr,ptr,$2);
-            $$=ptr;
-        }
-    |
-        lvalue //%prec USTAR 
-    |
-        tREADSW tOP {
-                push_ptr(push_value(&vec,getTempVarName()));
-                elevate(&vec);
-            } rvalue tCP {
-                int* ptr = pop_ptr();
-                fprintf(file,"GSW %p %p\n",$4, ptr);
-                $$=ptr;
-                delevate(&vec);
-            }
-    |
-        rvalue tADD
-        {
-            push_ptr(push_value(&vec,getTempVarName()));
-            elevate(&vec);
-        }
-        rvalue {
-            int* ptr = pop_ptr();
-            fprintf(file,"ADD %p %p %p\n",ptr,$1,$4);
-            $$=ptr;
-            delevate(&vec);
-        }
-    |
-        rvalue tSUB
-        {
-            push_ptr(push_value(&vec,getTempVarName()));
-            elevate(&vec);
-        }
-        rvalue {
-            int* ptr = pop_ptr();
-            fprintf(file,"SUB %p %p %p\n",ptr,$1,$4);
-            $$=ptr;
-            delevate(&vec);
-        }
-    |
-        rvalue tMUL
-        {
-            push_ptr(push_value(&vec,getTempVarName()));
-            elevate(&vec);
-        }
-        rvalue {
-            int* ptr = pop_ptr();
-            fprintf(file,"MUL %p %p %p\n",ptr,$1,$4);
-            $$=ptr;
-            delevate(&vec);
-        }
-    |
-        rvalue tDIV
-        {
-            push_ptr(push_value(&vec,getTempVarName()));
-            elevate(&vec);
-        }
-        rvalue {
-            int* ptr = pop_ptr();
-            fprintf(file,"DIV %p %p %p\n",ptr,$1,$4);
-            $$=ptr;
-            delevate(&vec);
-        }
-    |
-        rvalue tLE
-        {
-            push_ptr(push_value(&vec,getTempVarName()));
-            elevate(&vec);
-        }
-        rvalue {
-            int* ptr = pop_ptr();
-            fprintf(file,"CLE %p %p %p\n",ptr,$1,$4);
-            $$=ptr;
-            delevate(&vec);
-        }
-    |
-        rvalue tGE
-        {
-            push_ptr(push_value(&vec,getTempVarName()));
-            elevate(&vec);
-        }
-        rvalue {
-            int* ptr = pop_ptr();
-            fprintf(file,"CGE %p %p %p\n",ptr,$1,$4);
-            $$=ptr;
-            delevate(&vec);
-        }
-    |
-        rvalue tLT
-        {
-            push_ptr(push_value(&vec,getTempVarName()));
-            elevate(&vec);
-        }
-        rvalue {
-            int* ptr = pop_ptr();
-            fprintf(file,"CLT %p %p %p\n",ptr,$1,$4);
-            $$=ptr;
-            delevate(&vec);
-        }
-    |
-        rvalue tGT
-        {
-            push_ptr(push_value(&vec,getTempVarName()));
-            elevate(&vec);
-        }
-        rvalue {
-            int* ptr = pop_ptr();
-            fprintf(file,"CGT %p %p %p\n",ptr,$1,$4);
-            $$=ptr;
-            delevate(&vec);
-        }
-    |
-        rvalue tCEQ
-        {
-            push_ptr(push_value(&vec,getTempVarName()));
-            elevate(&vec);
-        }
-        rvalue {
-            int* ptr = pop_ptr();
-            fprintf(file,"CEQ %p %p %p\n",ptr,$1,$4);
-            $$=ptr;
-            delevate(&vec);
-        }
-    |
-        rvalue tNEQ
-        {
-            push_ptr(push_value(&vec,getTempVarName()));
-            elevate(&vec);
-        }
-        rvalue {
-            int* ptr = pop_ptr();
-            fprintf(file,"CNE %p %p %p\n",ptr,$1,$4);
-            $$=ptr;
-            delevate(&vec);
-        }
-    |
-        rvalue tOPE rvalue {
-            fprintf(stderr,"Unsupported operation: %s (line %i)\n",$2,__LINE__);
-            exit(1);
-        }
-    |
-        lvalue tEQ {elevate(&vec);} rvalue {
-            delevate(&vec);
-            fprintf(file,"COP %p %p\n",$1,$4);
-            $$=$1;
-        }
-    |
-        tOP rvalue tCP {$$=$2;}
-    ; 
-
 
 
 %%
