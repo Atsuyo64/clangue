@@ -1,9 +1,15 @@
 # Rapport de Projet Système Informatique
 
+- Victor LASSERRE
+- Valentin SERVIERES
+
+> Repo Raisingue [https://github.com/Atsuyo64/raisingue/](https://github.com/Atsuyo64/raisingue/)
+> Repo Raisingue [https://github.com/Atsuyo64/clangue/](https://github.com/Atsuyo64/clangue/)
+> 
 ## 1. Introduction
 
 Pour ce projet, nous avons développé un compilateur (nommé *clangue*) pour un langage C simplifié et un processeur pipeliné (nommé *raisingue*) en utilisant Lex, Yacc, et VHDL.\
-Le compilateur est structuré en deux étapes distinctes : une étape d'analyse lexicale, grammaticale et syntaxique pour générer un assembleur orienté mémoire. Cette étape est suivie d'un cross-compilateur en Python (asm2machineCode.py) qui transforme l'assembleur orienté mémoire en un format orienté registre et génère une mémoire d'instructions en VHDL.\
+Le compilateur est structuré en deux étapes distinctes : une étape d'analyse lexicale, grammaticale et syntaxique pour générer un assembleur orienté mémoire. Cette étape est suivie d'un cross-compilateur en Python [(asm2machineCode.py)](src/asm2machineCode.py) qui transforme l'assembleur orienté mémoire en un format orienté registre et génère une mémoire d'instructions en VHDL.\
 Le processeur *raisingue* est conçu pour exécuter ces instructions en utilisant un pipeline à quatre étages, avec gestion des aléas et des entrées/sorties.
 
 ## 2. Démarche de conception
@@ -69,6 +75,8 @@ Le processeur utilise le pipeline proposé dans le sujet. Notre version possède
 Comme le montre la figure suivante, notre processeur ajoute les unités suivantes : Unité de branchement, 
 ![Schéma de l'architecture](doc/archi.jpg)
 
+Les nouvelles unités (en vert) sont : Prescaler, stdin, stdout, NOZ et un MUX. Decoder fait office d'unité de branchement.
+
 #### 3.2.3 Aléas
 
 Les risques d'aléas sont causés par le fait que plusieurs operations interdépendantes peuvent être en même temps dans le pipeline. Dans notre processeur, les aléas ont été éliminés grâce au _Decoder_ qui indique à _PC_ de rajouter des instructions `NOP` en cas de risque d'aléas. Nous avons amélioré la rapidité d'exécution de 29.5% (3.1 ms contre 4.4 ms sur un programme test) en ne rajoutant des `NOP` qu'après des instructions nécessitant un write-back.
@@ -100,22 +108,18 @@ Ajout d'instructions `LDR` et `STR` pour passer de l'un à l'autre.
 
 Ajout de NOP entre les instructions au niveau du processeur.
 
-# TODO: yyerror
-
 ### 5. Résultats obtenus
 
 Le compilateur *clangue* génère correctement un assembleur simplifié qui est ensuite transformé en code machine par le cross-compilateur Python. Le processeur *raisingue* exécute correctement les instructions, gère les sauts et évite les conflits de données.
 
 Le débogueur *R.I.C.A.R.D.* permet de tester le code machine généré par les compilateurs. Il permet aussi de le debugger en permettant de suivre l’état des registres et de la mémoire pendant l’exécution du code.
 
-### 6. Justification des instructions ajoutées
+### 6. Jeu réalisé
 
-# TODO: ou pas ?
-Certaines instructions ont été ajoutées pour répondre à des besoins spécifiques du processeur et du compilateur :
-
-* **NOZ** : Cette instruction met à jour un flag indiquant si un registre contient une valeur différente de zéro. Elle est essentielle pour gérer correctement les conditions de saut dans les instructions comme JMF (Jump if Flag).
-* **JMP/JMF** : Ces instructions conditionnelles ont été ajoutées pour gérer les flux de contrôle du programme, notamment les boucles et les structures conditionnelles, et permettent de contrôler l’exécution en fonction de l’état du processeur.
+Afin de démontrer les capacités de notre compilateur + processeur, nous avons créé un petit jeu. Le but du jeu est de déterminer le prochain terme de la suite de Fibonacci (en binaire).\
+Le programme affiche un message pour informer le joueur de sa réussite ou non.\
+![Gameboy color (elle est bleue)](doc/jeu.jpg)
 
 ### 7. Conclusion
 
-Le projet a permis de développer un compilateur fonctionnel et un processeur pipeliné capable de traiter un ensemble d’instructions arithmétiques, logiques et de contrôle de flux. La gestion des aléas du pipeline et l’optimisation des sauts conditionnels ont été des défis majeurs, mais les solutions mises en place ont permis de garantir la bonne exécution du système. Le débogueur intégré *R.I.C.A.R.D.* constitue un outil précieux pour valider le bon fonctionnement des programmes et du compilateur et le processeur dans différents scénarios d'exécution.
+Le projet a permis de développer un compilateur fonctionnel et un processeur pipeliné capable de traiter un ensemble d’instructions arithmétiques, logiques et de contrôle de flux. La gestion des aléas du pipeline et l’optimisation des sauts conditionnels ont été des défis majeurs, mais les solutions mises en place ont permis de garantir la bonne exécution du système. Le débogueur intégré *R.I.C.A.R.D.* constitue un outil pratique pour valider le bon fonctionnement des programmes et du compilateur et le processeur dans différents scénarios d'exécution.
