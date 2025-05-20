@@ -8,17 +8,18 @@
 %token <id> tID tTYPE tOPE
 %type <ptr> rvalue lvalue //pointer
        /* non‐associative, highest precedence */
-%nonassoc UESTAR
+/* %nonassoc tEQ */
 %nonassoc USTAR 
 %nonassoc REDUCE 
 %nonassoc tELSE
-%nonassoc tEQ
+
+/* %left tEQ */
 
 %left tESP
 %left tADD tSUB
 %left tMUL tDIV tOPE
 %left tLE tGE tLT tGT tCEQ tNEQ
-/* %right tEQ */
+%right tEQ
 
 %{
 #include "stdio.h"
@@ -242,12 +243,11 @@ lvalue:
     ;
 
 rvalue:
-       
-        tMUL rvalue tEQ {elevate(&vec);} rvalue {
+        tMUL rvalue %prec tEQ tEQ {elevate(&vec);} rvalue {
             delevate(&vec);
             fprintf(file,"SRF %p %p\n",$2,$5);
             $$=$2;
-        } %prec UESTAR
+        }
     | 
         tESP lvalue { 
             /* TODO: FIXME: $2 is an address of the variable; but we want the address‐of operator: */
@@ -272,7 +272,7 @@ rvalue:
             $$=ptr;
         }
     |
-        lvalue %prec USTAR
+        lvalue //%prec USTAR 
     |
         tREADSW tOP {
                 push_ptr(push_value(&vec,getTempVarName()));
