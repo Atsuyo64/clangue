@@ -98,6 +98,8 @@ declarations:
     | 
         tTYPE tMUL tID tEQ rvalue             
         {
+
+            //FIXME: TEMPLATE ????
             int *dst = push_pointer(&vec, $3, /* ptr_level= */1);
             // fprintf(file, "AFC %p #%d\n", dst, $5);
             fprintf(file, "COP %p %p\n", dst, $5);
@@ -216,9 +218,9 @@ lvalue:
                                 find_ptr_level(&vec, p) - 1
                                );
         // fprintf(file, "AFC %p #%d\n", temp, p);
-        fprintf(file, "COP %p %p\n", temp, p);
+        // fprintf(file, "COP %p %p\n", temp, p);
         // fprintf(file, "LDR %p %p\n", temp, p);
-        // fprintf(file, "LRF %p %p\n", temp, p);
+        fprintf(file, "LRF %p %p\n", temp, p);
         $$ = temp;
     }
     |

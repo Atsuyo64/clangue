@@ -21,6 +21,8 @@ instructions = {
     "CGT":17,
     "CEQ":18,
     "CNE":19,
+    "SRF":18, #Store Reference : SRF **@dest *@src
+    "LRF":19, #Load Reference : LRF *@dest **@src
     # "LRF":14, #Load Reference : LRF @dest *@src
 }
 
@@ -97,7 +99,7 @@ except OSError as e:
     sys.exit(1)
 
 for line in src.readlines():
-    if line.startswith('\n') or line.startswith('#'):
+    if line.startswith('\n') or line.startswith('#') or line.startswith('--'):
         continue
     if line.endswith('\n'):
         line = line[:-1]
@@ -162,14 +164,22 @@ for line in src.readlines():
             append_load(2,A)
             append_instruction(opcode<<24 | 1<<16 | 2<<8 | 0<<0)
             append_store(1,B)
-        # elif args[0] == "LRF":
-        #     if len(args) != 3:
-        #         print("Error at line "+line)
-        #         break
-        #     A,B = [int(x,16)//4 for x in args[1:]] # A <- B
-        #     append_load(2,A)
-        #     append_instruction(opcode<<24 | 1<<16 | 2<<8 | 0<<0)
-        #     append_store(1,B)
+        elif args[0] == "SRF":
+            if len(args) != 3:
+                print("Error at line "+line)
+                break
+            A,B = [int(x,16)//4 for x in args[1:]] # **A <- *B
+            append_load(10,B)
+            append_load(11,A)
+            append_instruction(opcode<<24 | 0<<16 | 11<<8 | 10<<0)
+        elif args[0] == "LRF":
+            if len(args) != 3:
+                print("Error at line "+line)
+                break
+            A,B = [int(x,16)//4 for x in args[1:]] # *A <- **B
+            append_load(10,B)
+            append_instruction(opcode<<24 | 11<<16 | 10<<8 | 0<<0)
+            append_store(11,A)
         else:
             print("Not implemented instruction: "+args[0]+" at line "+line)
             break
