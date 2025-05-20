@@ -7,10 +7,12 @@ main(){
      */
     /* skur ? */
     printf(7, /* skur*/ a0);
+    // *a=1;
+    // (*a)=1;
     /*
         //Comment inside comment ????
         * with star inside
         ** double start ??
     */
-   /*plz ?*/
+   /*plz ?**/
 }

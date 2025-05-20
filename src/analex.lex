@@ -7,7 +7,7 @@
 #define VALUE_RET_NB(x) {printf(" " #x "[%s]",yytext);}
 #else //not DEBUG_LEX
 #include "y.tab.h"
-// #define printf(...) {}
+#define printf(...) {}
 #define NAME_RET(x)  {printf(" " #x); return x;}
 #define VALUE_RET_ID(x) {printf(" " #x "[%s]",yytext); yylval.id=strdup(yytext); return x;}
 #define VALUE_RET_NB(x) {printf(" " #x "[%s]",yytext); yylval.nb=(int)strtold(yytext,NULL); return x;}
@@ -20,15 +20,10 @@ INT {D}+([eE]{D}+)?|0[xX][0-9a-fA-F]+
 OPE [|\^]|"<<"|">>"
 TYPE "int"|"const"
 NAME [a-zA-Z_][a-zA-Z0-9_]*
-MLC_START "/*"
-MLC_NOT_WORRYING [^*]
-MLC_WORRYING "*"
-MLC_NOT_WORRYING_NOR_FINAL [^*/]
-MLC_FINAL "/"
 
 %%
 "//"[^\n]*                  { }
-{MLC_START}({MLC_NOT_WORRYING}*{MLC_WORRYING}+{MLC_NOT_WORRYING_NOR_FINAL})*{MLC_NOT_WORRYING}*{MLC_WORRYING}+{MLC_FINAL}   {printf("SOKUR:'%s'",yytext); /* DOES NOT WORK IF COMMENT ENDS WITH '*' */ }
+"/*"([^*]*"*"+[^*/])*[^*]*"*"+"/"   { /* multi line comments */ }
 "main"                      NAME_RET(tMAIN)
 {INT}                       VALUE_RET_NB(tNB)
 "&"                         NAME_RET(tESP)
