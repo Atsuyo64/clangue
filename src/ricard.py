@@ -26,6 +26,8 @@ instructions = {
     "CGT":17,
     "CEQ":18,
     "CNE":19,
+    "SRF":20, #Store Reference : SRF **@dest *@src
+    "LRF":21, #Load Reference : LRF *@dest **@src
 }
 
 def op2ins(op):
@@ -84,6 +86,10 @@ def print_line(line):
         print(f"print(r{line[3]},r{line[2]})")
     elif line[0] == "GSW":
         print(f"r{line[1]} <- switch[r{line[2]}]")
+    elif line[0] == "SRF":
+        print(f"@at(r{line[2]}) <- r{line[3]}")
+    elif line[0] == "LRF":
+        print(f"r{line[1]} <- @at{line[2]}")
     else:
         print(f"Unknown: {line}")
 
@@ -193,6 +199,12 @@ def exec_line():
             else:
                 v = 1
         reg_mem[line[1]] = v
+        line_num += 1
+    elif line[0] == "SRF":
+        data_mem[reg_mem[line[2]]] = reg_mem[line[3]]
+        line_num += 1
+    elif line[0] == "LRF":
+        reg_mem[line[1]] = data_mem[reg_mem[line[2]]]
         line_num += 1
     else:
         print(f"Unknown: {line}")

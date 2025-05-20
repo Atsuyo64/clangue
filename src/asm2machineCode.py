@@ -21,8 +21,8 @@ instructions = {
     "CGT":17,
     "CEQ":18,
     "CNE":19,
-    "SRF":18, #Store Reference : SRF **@dest *@src
-    "LRF":19, #Load Reference : LRF *@dest **@src
+    "SRF":20, #Store Reference : SRF **@dest *@src
+    "LRF":21, #Load Reference : LRF *@dest **@src
     # "LRF":14, #Load Reference : LRF @dest *@src
 }
 
