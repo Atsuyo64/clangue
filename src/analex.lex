@@ -23,7 +23,7 @@ NAME [a-zA-Z_][a-zA-Z0-9_]*
 
 %%
 "//"[^\n]*                  { }
-"/*"(^"*/")*?"*/"          {printf("oskour: '%s'",yytext); }
+"/*"([^*]|("*"[^/]))*"*/"   { /* DOES NOT WORK IF COMMENT ENDS WITH '*' */ }
 "main"                      NAME_RET(tMAIN)
 {INT}                       VALUE_RET_NB(tNB)
 "&"                         NAME_RET(tESP)
